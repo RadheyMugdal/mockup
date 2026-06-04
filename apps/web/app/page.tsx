@@ -1,4 +1,5 @@
 "use client";
+import SliderDemo from "@/components/shadcn-space/slider/slider-04";
 import { EditorState, HistoryState } from "@/lib/types";
 import { backgrounds, categories, cn } from "@/lib/utils";
 import { IconArrowBackUp, IconArrowDownToArc, IconArrowsMaximize, IconPaintFilled, IconStackForward, IconUpload, IconX } from "@tabler/icons-react";
@@ -19,6 +20,9 @@ import { useReducer, useState } from "react";
 const initialState: EditorState = {
   background: '/images/backgrounds/desktop/desktop-01.jpg'
 }
+
+type ScreenshotSettings = NonNullable<EditorState["screenshot"]>
+type NumericScreenshotSetting = Exclude<keyof ScreenshotSettings, "image">
 
 type Action =
   { type: 'update', payload: Partial<EditorState> }
@@ -76,6 +80,16 @@ export default function Page() {
 
   const canRedo = state.future.length > 0
   const canUndo = state.past.length > 0
+  const screenshotRadius = state.present.screenshot?.radius ?? 16
+  const screenshotPadding = state.present.screenshot?.padding ?? 0
+  const screenshotX = state.present.screenshot?.x ?? 0
+  const screenshotY = state.present.screenshot?.y ?? 0
+  const screenshotRotateX = state.present.screenshot?.rotateX ?? 0
+  const screenshotRotateY = state.present.screenshot?.rotateY ?? 0
+  const screenshotRotateZ = state.present.screenshot?.rotateZ ?? 0
+  const screenshotPerspective = state.present.screenshot?.perspective ?? 1200
+  const screenshotZoom = state.present.screenshot?.zoom ?? 1
+
   const handleBackgroundImageSelection = (bgUrl: string) => {
     dispatch({
       type: 'update', payload: {
@@ -83,6 +97,24 @@ export default function Page() {
       }
     })
   }
+  const updateScreenshot = (payload: Partial<ScreenshotSettings>) => {
+    dispatch({
+      type: 'update',
+      payload: {
+        screenshot: {
+          ...state.present.screenshot,
+          ...payload,
+        },
+      },
+    })
+  }
+  const handleScreenshotSliderChange = (
+    key: NumericScreenshotSetting,
+    fallback: number
+  ) => (value: number[]) => {
+    updateScreenshot({ [key]: value[0] ?? fallback })
+  }
+
   return (
     <main className="w-svw h-svh  flex flex-col">
       {/* Main content  */}
@@ -197,10 +229,13 @@ export default function Page() {
                                   </PopoverContent>
                                 </Popover>
                               )}
+
+
                             </div>
                           </div>
                         );
                       })}
+                      
                     </ScrollArea>
 
                   </TabsContent>
@@ -264,7 +299,7 @@ export default function Page() {
               </Popover>
               <div>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button variant={"outline"}>
                       <IconArrowsMaximize />
                     </Button>
@@ -287,97 +322,104 @@ export default function Page() {
                 />
                 <div className="absolute inset-0 flex items-center justify-center ">
                   <div
-                    className="mockup-card drop-shadow-[0_40px_60px_rgba(0,0,0,.3)] w-[85%] max-w-4xl bg-accent rounded-xl overflow-hidden"
+                    className="mockup-card drop-shadow-[0_40px_60px_rgba(0,0,0,.3)] w-[85%] max-w-4xl bg-accent rounded-xl   overflow-hidden"
                     style={{
+                      borderRadius: `${screenshotRadius}px`,
+                      padding: `${screenshotPadding}px`,
                       transform: `
-          translate(${state.present.screenshot?.x}px, ${state.present.screenshot?.y}px)
-          rotateX(${12}deg)
-          rotateY(${state.present.screenshot?.rotateY}deg)
-          rotateZ(${state.present.screenshot?.rotateZ}deg)
-          scale(${state.present.screenshot?.zoom})
+          perspective(${screenshotPerspective}px)
+          translate(${screenshotX}px, ${screenshotY}px)
+          rotateX(${screenshotRotateX}deg)
+          rotateY(${screenshotRotateY}deg)
+          rotateZ(${screenshotRotateZ}deg)
+          scale(${screenshotZoom})
         `,
                     }}
                   >
-                   {
-  !state.present.screenshot?.image ? (
-    <label
-      className="
-        aspect-video w-full
-        flex flex-col items-center justify-center
-        gap-4
-        cursor-pointer
-        rounded-md
-        border-2 border-dashed
-        border-border/60
-        bg-background/50
-        backdrop-blur-sm
-        transition-all
-        hover:border-primary
-        hover:bg-background
-      "
-    >
-      <div
-        className="
-          flex items-center justify-center
-          size-20 rounded-full
-          bg-primary/10
-        "
-      >
-        <IconUpload className="size-10 text-primary" />
-      </div>
+                    {
+                      !state.present.screenshot?.image ? (
+                        <label
+                          className="
+                            aspect-video w-full
+                            flex flex-col items-center justify-center
+                            gap-4
+                            cursor-pointer
+                            rounded-md
+                            border-border/60
+                            bg-background/50
+                            backdrop-blur-sm
+                            transition-all
+                            hover:border-primary
+                            hover:bg-background
+                          "
+                        >
+                          <div
+                            className="
+                              flex items-center justify-center
+                              size-20 rounded-full
+                              bg-primary/10
+                            "
+                          >
+                            <IconUpload className="size-10 text-primary" />
+                          </div>
 
-      <div className="text-center">
-        <p className="font-medium">
-          Upload screenshot
-        </p>
+                          <div className="text-center">
+                            <p className="font-medium">
+                              Upload screenshot
+                            </p>
 
-        <p className="text-sm text-muted-foreground">
-          Drag & drop or click to browse
-        </p>
+                            <p className="text-sm text-muted-foreground">
+                              Drag & drop or click to browse
+                            </p>
 
-        <p className="text-xs text-muted-foreground mt-2">
-          PNG, JPG, WEBP
-        </p>
-      </div>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              PNG, JPG, WEBP
+                            </p>
+                          </div>
 
-      <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (!file) return;
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
 
-          const reader = new FileReader();
+                              const reader = new FileReader();
 
-          reader.onload = () => {
-            dispatch({
-              type: "update",
-              payload: {
-                screenshot: {
-                  image: reader.result as string,
-                  x: 0,
-                  y: 0,
-                  zoom: 1,
-                  rotateY: 0,
-                  rotateZ: 0,
-                },
-              },
-            });
-          };
+                              reader.onload = () => {
+                                dispatch({
+                                  type: "update",
+                                  payload: {
+                                    screenshot: {
+                                      ...state.present.screenshot,
+                                      image: reader.result as string,
+                                      x: screenshotX,
+                                      y: screenshotY,
+                                      radius: screenshotRadius,
+                                      padding: screenshotPadding,
+                                      zoom: screenshotZoom,
+                                      rotateX: screenshotRotateX,
+                                      rotateY: screenshotRotateY,
+                                      rotateZ: screenshotRotateZ,
+                                      perspective: screenshotPerspective,
+                                    },
+                                  },
+                                });
+                              };
 
-          reader.readAsDataURL(file);
-        }}
-      />
-    </label>
-  ) : (
-    <img
-      src={state.present.screenshot.image}
-      className="aspect-video w-full object-cover"
-      alt="Screenshot"
-    />
-  )
-}
+                              reader.readAsDataURL(file);
+                            }}
+                          />
+                        </label>
+                      ) : (
+                        <img
+                          src={state.present.screenshot.image}
+                          className="aspect-video w-full   object-cover"
+                          alt="Screenshot"
+                        />
+                      )
+                    }
 
                   </div>
                 </div>
@@ -391,6 +433,89 @@ export default function Page() {
                 <IconArrowDownToArc />
                 Export mockup
               </Button>
+              <div className=" mt-4 flex flex-col gap-4">
+                <SliderDemo
+                  label="Radius"
+                  value={[screenshotRadius]}
+                  setValue={handleScreenshotSliderChange("radius", screenshotRadius)}
+                  min={0}
+                  max={100}
+                  step={0.1}
+                  unit="px"
+                />
+                <SliderDemo
+                  label="Padding"
+                  value={[screenshotPadding]}
+                  setValue={handleScreenshotSliderChange("padding", screenshotPadding)}
+                  min={0}
+                  max={80}
+                  step={1}
+                  unit="px"
+                />
+                <SliderDemo
+                  label="X"
+                  value={[screenshotX]}
+                  setValue={handleScreenshotSliderChange("x", screenshotX)}
+                  min={-300}
+                  max={300}
+                  step={1}
+                  unit="px"
+                />
+                <SliderDemo
+                  label="Y"
+                  value={[screenshotY]}
+                  setValue={handleScreenshotSliderChange("y", screenshotY)}
+                  min={-200}
+                  max={200}
+                  step={1}
+                  unit="px"
+                />
+                <SliderDemo
+                  label="Zoom"
+                  value={[screenshotZoom]}
+                  setValue={handleScreenshotSliderChange("zoom", screenshotZoom)}
+                  min={0.5}
+                  max={1.6}
+                  step={0.01}
+                  unit="x"
+                />
+                <SliderDemo
+                  label="Rotate X"
+                  value={[screenshotRotateX]}
+                  setValue={handleScreenshotSliderChange("rotateX", screenshotRotateX)}
+                  min={-45}
+                  max={45}
+                  step={1}
+                  unit="deg"
+                />
+                <SliderDemo
+                  label="Rotate Y"
+                  value={[screenshotRotateY]}
+                  setValue={handleScreenshotSliderChange("rotateY", screenshotRotateY)}
+                  min={-45}
+                  max={45}
+                  step={1}
+                  unit="deg"
+                />
+                <SliderDemo
+                  label="Rotate Z"
+                  value={[screenshotRotateZ]}
+                  setValue={handleScreenshotSliderChange("rotateZ", screenshotRotateZ)}
+                  min={-45}
+                  max={45}
+                  step={1}
+                  unit="deg"
+                />
+                <SliderDemo
+                  label="Perspective"
+                  value={[screenshotPerspective]}
+                  setValue={handleScreenshotSliderChange("perspective", screenshotPerspective)}
+                  min={300}
+                  max={2000}
+                  step={10}
+                  unit="px"
+                />
+              </div>
             </SidebarContent>
           </Sidebar>
         </SidebarProvider>
