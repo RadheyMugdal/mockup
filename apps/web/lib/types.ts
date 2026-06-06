@@ -1,5 +1,6 @@
 export type EditorState={
     background:string,
+    backgroundType?:"image" | "color",
     screenshot?:{
         radius?:number,
         padding?:number,
@@ -16,7 +17,7 @@ export type EditorState={
         type:"macbook" | "imac" | "macbook-pro" | "iphone" | "ipad",
         image?:string
     },
-
+    frameStyle?: "none" | "browser-light" | "browser-dark",
 }
 
 export type HistoryState={
