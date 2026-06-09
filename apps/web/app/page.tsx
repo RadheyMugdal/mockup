@@ -8,15 +8,15 @@ import {
   IconArrowDownToArc,
   IconArrowsMaximize,
   IconCheck,
+  IconHeart,
   IconPaintFilled,
+  IconPalette,
+  IconPlus,
   IconSettings,
   IconStackForward,
+  IconTrash,
   IconUpload,
   IconX,
-  IconPlus,
-  IconTrash,
-  IconPalette,
-  IconHeart,
 } from "@tabler/icons-react";
 import { AspectRatio } from "@workspace/ui/components/aspect-ratio";
 import { Button } from "@workspace/ui/components/button";
@@ -44,7 +44,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
-import { useReducer, useState, useEffect } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 const initialState: EditorState = {
   background: "/images/backgrounds/desktop/desktop-01.jpg",
@@ -1370,7 +1370,7 @@ export default function Page() {
                         Adjust position, size, corners, and perspective.
                       </div>
                     </div>
-                    <ScrollArea className="max-h-[calc(100svh-8rem)]">
+                    <ScrollArea className="  h-[40vh]">
                       <div className="flex flex-col gap-4 p-4">
                         {sliderSettings.map((setting) => {
                           const value = getScreenshotSetting(
