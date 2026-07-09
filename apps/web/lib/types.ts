@@ -17,7 +17,8 @@ export type EditorState={
         type:"macbook" | "imac" | "macbook-pro" | "iphone" | "ipad",
         image?:string
     },
-    frameStyle?: "none" | "browser-light" | "browser-dark",
+    frameStyle?: "none" | "browser-light" | "browser-dark" | "phone-light" | "phone-dark",
+    deviceType?: "desktop" | "mobile",
 }
 
 export type HistoryState={

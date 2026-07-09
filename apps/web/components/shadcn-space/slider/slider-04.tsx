@@ -6,7 +6,7 @@ import { Slider } from "@workspace/ui/components/slider";
 function SliderDemo({label,value,setValue,unit,min,max,step}:{label:string,value: number[],setValue: (value: number[]) => void,unit?:string,min:number,max:number,step:number}) {
 
   return (
-    <div className="w-full max-w-sm mx-auto">
+    <div className="w-full max-w-full">
       <div className="mb-2 flex items-center justify-between">
         <p className=" text-sm">
           {label}
