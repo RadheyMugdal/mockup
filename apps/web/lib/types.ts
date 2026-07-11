@@ -17,8 +17,12 @@ export type EditorState={
         type:"macbook" | "imac" | "macbook-pro" | "iphone" | "ipad",
         image?:string
     },
-    frameStyle?: "none" | "browser-light" | "browser-dark" | "phone-light" | "phone-dark",
+    frameStyle?: "none" | "browser-light" | "browser-dark" | "phone-light" | "phone-dark" | "custom-device",
     deviceType?: "desktop" | "mobile",
+    selectedFrame?: {
+        id: string;
+        color: string;
+    };
 }
 
 export type HistoryState={

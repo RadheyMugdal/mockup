@@ -229,6 +229,276 @@ const mockupPresets: MockupPreset[] = [
   },
 ];
 
+type AppleFrame = {
+  id: string;
+  name: string;
+  brand: "Apple" | "Google" | "Samsung" | "Dell" | "Lenovo" | "Huawei";
+  category: "all" | "phone" | "tablet" | "laptop" | "desktop" | "watch";
+  aspectRatio: string;
+  displayRatioClass: string;
+  resolution: string;
+  status?: "New" | "Featured";
+  colors: { name: string; value: string; hex: string }[];
+  insets: { top: string; left: string; right: string; bottom: string; borderRadius: string };
+  assetPattern: string;
+};
+
+const appleFrames: AppleFrame[] = [
+  {
+    id: "iphone-17-pro-max",
+    name: "iPhone 17 Pro Max",
+    brand: "Apple",
+    category: "phone",
+    aspectRatio: "9:19.5",
+    displayRatioClass: "aspect-[9/19.5]",
+    resolution: "440 x 956",
+    status: "New",
+    colors: [
+      { name: "Silver", value: "Silver", hex: "#e3e4e5" },
+      { name: "Cosmic Orange", value: "Cosmic Orange", hex: "#e26c48" },
+      { name: "Deep Blue", value: "Deep Blue", hex: "#2b4c6e" },
+    ],
+    insets: { top: "2.3%", left: "4.5%", right: "4.5%", bottom: "2.3%", borderRadius: "34px" },
+    assetPattern: "/Exports/iOS/17 Pro Max/17 Pro Max - ${color}.png"
+  },
+  {
+    id: "iphone-17-pro",
+    name: "iPhone 17 Pro",
+    brand: "Apple",
+    category: "phone",
+    aspectRatio: "9:19.5",
+    displayRatioClass: "aspect-[9/19.5]",
+    resolution: "430 x 932",
+    status: "New",
+    colors: [
+      { name: "Silver", value: "Silver", hex: "#e3e4e5" },
+      { name: "Cosmic Orange", value: "Cosmic Orange", hex: "#e26c48" },
+      { name: "Deep Blue", value: "Deep Blue", hex: "#2b4c6e" },
+    ],
+    insets: { top: "2.3%", left: "4.5%", right: "4.5%", bottom: "2.3%", borderRadius: "34px" },
+    assetPattern: "/Exports/iOS/17 Pro/17 Pro - ${color}.png"
+  },
+  {
+    id: "iphone-16-pro-max",
+    name: "iPhone 16 Pro Max",
+    brand: "Apple",
+    category: "phone",
+    aspectRatio: "9:19.5",
+    displayRatioClass: "aspect-[9/19.5]",
+    resolution: "440 x 956",
+    colors: [
+      { name: "Natural Titanium", value: "Natural Titanium", hex: "#a09d98" },
+      { name: "Black Titanium", value: "Black Titanium", hex: "#222224" },
+      { name: "Desert Titanium", value: "Desert Titanium", hex: "#c4b5a2" },
+      { name: "White Titanium", value: "White Titanium", hex: "#e3e4e5" },
+    ],
+    insets: { top: "2.3%", left: "4.5%", right: "4.5%", bottom: "2.3%", borderRadius: "34px" },
+    assetPattern: "/Exports/iOS/16 Pro Max/16 Pro Max - ${color}.png"
+  },
+  {
+    id: "iphone-16-pro",
+    name: "iPhone 16 Pro",
+    brand: "Apple",
+    category: "phone",
+    aspectRatio: "9:19.5",
+    displayRatioClass: "aspect-[9/19.5]",
+    resolution: "430 x 932",
+    colors: [
+      { name: "Natural Titanium", value: "Natural Titanium", hex: "#a09d98" },
+      { name: "Black Titanium", value: "Black Titanium", hex: "#222224" },
+      { name: "Desert Titanium", value: "Desert Titanium", hex: "#c4b5a2" },
+      { name: "White Titanium", value: "White Titanium", hex: "#e3e4e5" },
+    ],
+    insets: { top: "2.3%", left: "4.5%", right: "4.5%", bottom: "2.3%", borderRadius: "34px" },
+    assetPattern: "/Exports/iOS/16 Pro/16 Pro - ${color}.png"
+  },
+  {
+    id: "iphone-16",
+    name: "iPhone 16",
+    brand: "Apple",
+    category: "phone",
+    aspectRatio: "9:19.5",
+    displayRatioClass: "aspect-[9/19.5]",
+    resolution: "393 x 852",
+    colors: [
+      { name: "Black", value: "Black", hex: "#1c1c1e" },
+      { name: "Pink", value: "Pink", hex: "#f0b6c3" },
+      { name: "Teal", value: "Teal", hex: "#5d9996" },
+      { name: "Ultramarine", value: "Ultramarine", hex: "#465f8a" },
+      { name: "White", value: "White", hex: "#f1f0ec" },
+    ],
+    insets: { top: "2.3%", left: "4.5%", right: "4.5%", bottom: "2.3%", borderRadius: "34px" },
+    assetPattern: "/Exports/iOS/16/16 - ${color}.png"
+  },
+  {
+    id: "pixel-9-pro",
+    name: "Pixel 9 Pro",
+    brand: "Google",
+    category: "phone",
+    aspectRatio: "9:19.5",
+    displayRatioClass: "aspect-[9/19.5]",
+    resolution: "420 x 912",
+    colors: [
+      { name: "Obsidian", value: "Obsidian", hex: "#1c1c1e" },
+      { name: "Hazel", value: "Hazel", hex: "#7a7772" },
+      { name: "Rose Quartz", value: "Rose Quartz", hex: "#f2d3d9" },
+    ],
+    insets: { top: "2.4%", left: "4.8%", right: "4.8%", bottom: "2.4%", borderRadius: "30px" },
+    assetPattern: "/Exports/Android Phone/Pixel 9 Pro/Pixel 9 Pro - ${color}.png"
+  },
+  {
+    id: "ipad-pro-13",
+    name: "iPad Pro 13",
+    brand: "Apple",
+    category: "tablet",
+    aspectRatio: "3:4",
+    displayRatioClass: "aspect-[3/4]",
+    resolution: "2064 x 2752",
+    colors: [
+      { name: "Silver", value: "Silver", hex: "#e3e4e5" },
+      { name: "Space Black", value: "Space Black", hex: "#1c1d21" },
+    ],
+    insets: { top: "4.5%", left: "4.5%", right: "4.5%", bottom: "4.5%", borderRadius: "20px" },
+    assetPattern: "/Exports/iPadOS/iPad Pro/M4 & M5/13/iPad Pro 13 M4 & M5 - Portrait - ${color}.png"
+  },
+  {
+    id: "macbook-pro-16",
+    name: "MacBook Pro 16",
+    brand: "Apple",
+    category: "laptop",
+    aspectRatio: "16:10",
+    displayRatioClass: "aspect-[16/10]",
+    resolution: "3456 x 2234",
+    colors: [
+      { name: "Space Black", value: "Space Black", hex: "#1c1d21" },
+      { name: "Silver", value: "Silver", hex: "#e3e4e5" },
+    ],
+    insets: { top: "6.8%", left: "12%", right: "12%", bottom: "12.8%", borderRadius: "10px" },
+    assetPattern: "/Exports/MacBook/MacBook Pro 16.png"
+  },
+  {
+    id: "macbook-air-15",
+    name: "MacBook Air 15",
+    brand: "Apple",
+    category: "laptop",
+    aspectRatio: "16:10",
+    displayRatioClass: "aspect-[16/10]",
+    resolution: "2880 x 1864",
+    colors: [
+      { name: "Space Gray", value: "Space Gray", hex: "#5d5f62" },
+    ],
+    insets: { top: "6.8%", left: "12%", right: "12%", bottom: "12.8%", borderRadius: "10px" },
+    assetPattern: "/Exports/MacBook/MacBook Air 15.png"
+  },
+  {
+    id: "dell-xps-16",
+    name: "Dell XPS 16",
+    brand: "Dell",
+    category: "laptop",
+    aspectRatio: "16:10",
+    displayRatioClass: "aspect-[16/10]",
+    resolution: "3840 x 2400",
+    colors: [
+      { name: "Graphite", value: "Graphite", hex: "#3a3c3e" },
+      { name: "Platinum", value: "Platinum", hex: "#e3e4e5" },
+    ],
+    insets: { top: "5.5%", left: "10.5%", right: "10.5%", bottom: "10.8%", borderRadius: "8px" },
+    assetPattern: "/Exports/Windows Laptop/Dell/2024 XPS 16 Graphite.png" // dell uses graphite
+  },
+  {
+    id: "imac-24",
+    name: "iMac 24",
+    brand: "Apple",
+    category: "desktop",
+    aspectRatio: "16:9",
+    displayRatioClass: "aspect-[16/9]",
+    resolution: "4480 x 2520",
+    colors: [
+      { name: "Silver", value: "Silver", hex: "#e3e4e5" },
+      { name: "Blue", value: "Blue", hex: "#3f7fa6" },
+      { name: "Green", value: "Green", hex: "#599878" },
+      { name: "Orange", value: "Orange", hex: "#d87453" },
+      { name: "Purple", value: "Purple", hex: "#8b74a3" },
+      { name: "Red", value: "Red", hex: "#b84f59" },
+      { name: "Yellow", value: "Yellow", hex: "#d4aa55" },
+    ],
+    insets: { top: "4.5%", left: "4.5%", right: "4.5%", bottom: "22.5%", borderRadius: "8px" },
+    assetPattern: "/Exports/Mac Desktop/iMac 24/iMac 24 - ${color}.png"
+  },
+  {
+    id: "pro-display-xdr",
+    name: "Pro Display XDR",
+    brand: "Apple",
+    category: "desktop",
+    aspectRatio: "16:9",
+    displayRatioClass: "aspect-[16/9]",
+    resolution: "6016 x 3384",
+    colors: [
+      { name: "Silver", value: "Silver", hex: "#e3e4e5" },
+    ],
+    insets: { top: "4.8%", left: "4.8%", right: "4.8%", bottom: "24.5%", borderRadius: "10px" },
+    assetPattern: "/Exports/Mac Desktop/Pro Display XDR/Pro Display XDR.png"
+  },
+];
+
+const catalogCategories = [
+  { id: "all", label: "All", icon: null },
+  { 
+    id: "phone", 
+    label: "Phone", 
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+        <path d="M12 18h.01"/>
+      </svg>
+    ) 
+  },
+  { 
+    id: "tablet", 
+    label: "Tablet", 
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <rect width="16" height="20" x="4" y="2" rx="2" ry="2" transform="rotate(90 12 12)"/>
+        <path d="M12 18h.01"/>
+      </svg>
+    ) 
+  },
+  { 
+    id: "laptop", 
+    label: "Laptop", 
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <path d="M20 16V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12"/>
+        <path d="M2 20h20"/>
+        <path d="M12 16v4"/>
+      </svg>
+    ) 
+  },
+  { 
+    id: "desktop", 
+    label: "Desktop", 
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <rect width="20" height="14" x="2" y="3" rx="2"/>
+        <line x1="8" x2="16" y1="21" y2="21"/>
+        <line x1="12" x2="12" y1="17" y2="21"/>
+      </svg>
+    ) 
+  },
+  { 
+    id: "watch", 
+    label: "Watch", 
+    icon: (
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <rect width="12" height="18" x="6" y="3" rx="3"/>
+        <path d="M12 3V1"/>
+        <path d="M12 23v-2"/>
+        <path d="M12 7V9"/>
+      </svg>
+    ) 
+  },
+];
+
 const solidPresets: ColorPreset[] = [
   { name: "Apple Gray", value: "#f5f5f7" },
   { name: "GitHub Dark", value: "#0d1117" },
@@ -518,6 +788,57 @@ export default function Page() {
   const [isExporting, setIsExporting] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const [activeMobileDrawer, setActiveMobileDrawer] = useState<"canvas" | "layouts" | "device" | "adjust" | "export" | null>(null);
+  
+  const [isDeviceCatalogOpen, setIsDeviceCatalogOpen] = useState(false);
+  const [selectedCatalogCategory, setSelectedCatalogCategory] = useState<"all" | "phone" | "tablet" | "laptop" | "desktop" | "watch">("all");
+  const [catalogDeviceColors, setCatalogDeviceColors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isDeviceCatalogOpen) {
+      const initialColors: Record<string, string> = {};
+      appleFrames.forEach((frame) => {
+        initialColors[frame.id] = frame.colors[0]?.value ?? "silver";
+      });
+      if (state.present.selectedFrame) {
+        initialColors[state.present.selectedFrame.id] = state.present.selectedFrame.color;
+      }
+      setCatalogDeviceColors(initialColors);
+    }
+  }, [isDeviceCatalogOpen, state.present.selectedFrame]);
+
+  const handleCatalogDeviceColorChange = (frameId: string, colorValue: string) => {
+    setCatalogDeviceColors(prev => ({
+      ...prev,
+      [frameId]: colorValue
+    }));
+    if (state.present.frameStyle === "custom-device" && state.present.selectedFrame?.id === frameId) {
+      dispatch({
+        type: "update",
+        payload: {
+          selectedFrame: {
+            id: frameId,
+            color: colorValue
+          }
+        }
+      });
+    }
+  };
+
+  const handleSelectAppleFrame = (frame: AppleFrame, color: string) => {
+    dispatch({
+      type: "update",
+      payload: {
+        deviceType: frame.category === "phone" ? "mobile" : "desktop",
+        frameStyle: "custom-device",
+        selectedFrame: {
+          id: frame.id,
+          color: color
+        }
+      }
+    });
+    setIsDeviceCatalogOpen(false);
+    toast.success(`Applied ${frame.name} frame!`);
+  };
   
   const [sectionsExpanded, setSectionsExpanded] = useState({
     layouts: true,
@@ -836,6 +1157,372 @@ export default function Page() {
     (key: NumericScreenshotSetting, fallback: number) => (value: number[]) => {
       updateScreenshot({ [key]: value[0] ?? fallback });
     };
+
+  const renderCustomAppleFrame = (frameId: string, color: string) => {
+    const frame = appleFrames.find(f => f.id === frameId);
+    if (!frame) return null;
+
+    const imageUrl = frame.assetPattern.replace("${color}", color);
+    const insets = frame.insets;
+
+    const renderFrameScreenshot = () => {
+      if (!state.present.screenshot?.image) {
+        return (
+          <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center gap-2 bg-zinc-900/90 hover:bg-zinc-850 transition-colors select-none p-4">
+            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 shrink-0">
+              <IconUpload className="size-4 text-primary" />
+            </div>
+            <p className="text-[9px] font-medium text-zinc-400 text-center">Upload mockup image</p>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleScreenshotUpload}
+            />
+          </label>
+        );
+      }
+      return (
+        <img
+          src={state.present.screenshot.image}
+          className="w-full h-full object-cover shrink-0 select-none"
+          alt="Mockup Screenshot"
+        />
+      );
+    };
+
+    return (
+      <div className="relative w-full h-full flex items-center justify-center">
+        {/* Screenshot in transparent window */}
+        <div 
+          className="absolute overflow-hidden bg-black"
+          style={{
+            top: insets.top,
+            left: insets.left,
+            right: insets.right,
+            bottom: insets.bottom,
+            borderRadius: insets.borderRadius
+          }}
+        >
+          {renderFrameScreenshot()}
+        </div>
+
+        {/* Bezel Overlay */}
+        <img
+          src={imageUrl}
+          className="relative w-full h-auto pointer-events-none select-none z-10 block"
+          alt={frame.name}
+        />
+      </div>
+    );
+  };
+
+  const renderFrameCatalogCard = (frame: AppleFrame) => {
+    if (!frame) return null;
+    const activeColor = catalogDeviceColors[frame.id] ?? frame.colors[0]?.value ?? "silver";
+    const previewUrl = frame.assetPattern.replace("${color}", activeColor);
+
+    return (
+      <div 
+        key={frame.id} 
+        className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-zinc-750 transition group"
+      >
+        {/* Thumbnail Preview Area */}
+        <div className="aspect-video w-full rounded-lg bg-zinc-950 flex items-center justify-center p-2 relative overflow-hidden mb-3 border border-zinc-850">
+          <img
+            src={previewUrl}
+            className="max-h-[90%] max-w-[90%] object-contain select-none transition-transform duration-300 group-hover:scale-105"
+            alt={frame.name}
+          />
+          
+          {/* Status Badge */}
+          {frame.status && (
+            <span className="absolute top-1.5 right-1.5 bg-zinc-100 text-zinc-950 text-[8px] font-bold px-1.5 py-0.5 rounded-full select-none">
+              {frame.status}
+            </span>
+          )}
+        </div>
+
+        {/* Specs and Details */}
+        <div className="flex-1 flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between gap-1">
+              <div className="flex items-center gap-1.5 min-w-0">
+                {frame.brand === "Apple" && (
+                  <svg className="size-3 fill-zinc-400 shrink-0" viewBox="0 0 170 170">
+                    <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.92-14.37-6.15-2.82-2.38-6.53-6.83-11.1-13.36-7.85-11.4-13.91-23.75-18.17-37.06-4.26-13.31-6.39-25.56-6.39-36.78 0-16.14 3.96-29.28 11.89-39.41 7.92-10.13 18.06-15.34 30.41-15.65 5.66 0 11.55 1.76 17.67 5.27 6.13 3.51 10.42 5.27 12.88 5.27 1.95 0 6-1.57 12.16-4.7 6.16-3.14 11.85-4.66 17.07-4.56 12.39.4 22.39 4.96 29.98 13.68 5.92 6.95 10.04 15.11 12.37 24.5-13.99 5.75-20.9 15.66-20.73 29.74.17 11.04 4.3 20.15 12.39 27.32 8.09 7.17 17.67 11.02 28.74 11.56-2.2 6.07-4.42 11.5-6.66 16.3zm-38.37-124.9c0 8.09-3 15.71-9.01 22.86-6 7.15-13.36 11.52-22.09 13.1-1-8.31 2-16.14 8.03-23.47 6.03-7.33 13.56-11.54 22.59-12.63.48.14.48.14.48.14z"/>
+                  </svg>
+                )}
+                {frame.brand === "Google" && (
+                  <svg className="size-3 fill-zinc-400 shrink-0" viewBox="0 0 24 24">
+                    <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18 8.448 18 5.37 14.922 5.37 11.13s3.078-6.87 6.87-6.87c1.785 0 3.398.643 4.67 1.857l2.42-2.42C17.382 1.83 14.957 1 12.24 1a10.13 10.13 0 0 0-10.13 10.13 10.13 10.13 0 0 0 10.13 10.13c5.385 0 9.77-3.9 9.77-9.77 0-.61-.054-1.2-.162-1.77h-9.608z"/>
+                  </svg>
+                )}
+                {frame.brand === "Dell" && (
+                  <span className="text-[8px] font-bold border border-zinc-700 px-1 py-0.2 rounded-xs text-zinc-400 font-mono scale-90 shrink-0">DELL</span>
+                )}
+                <h4 className="text-xs font-semibold tracking-wide truncate">{frame.name}</h4>
+              </div>
+              <span className="text-[9px] font-mono text-zinc-500 shrink-0">{frame.resolution}</span>
+            </div>
+            <p className="text-[9px] text-zinc-500 mt-0.5">Aspect ratio {frame.aspectRatio}</p>
+          </div>
+
+          {/* Color Dots */}
+          <div className="flex items-center gap-1.5 mt-3 mb-3">
+            {frame.colors.map(col => {
+              const selected = activeColor === col.value;
+              return (
+                <button
+                  key={col.value}
+                  onClick={() => handleCatalogDeviceColorChange(frame.id, col.value)}
+                  className={cn(
+                    "size-4 rounded-full flex items-center justify-center transition border cursor-pointer",
+                    selected ? "border-zinc-100 scale-110" : "border-zinc-800 hover:border-zinc-650"
+                  )}
+                  title={col.name}
+                >
+                  <span className="size-2.5 rounded-full" style={{ backgroundColor: col.hex }} />
+                </button>
+              );
+            })}
+          </div>
+
+          <Button 
+            size="xs" 
+            className="w-full h-7 text-[10px] font-medium cursor-pointer"
+            onClick={() => handleSelectAppleFrame(frame, activeColor)}
+          >
+            Select Frame
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderCatalogSections = () => {
+    const filteredFrames = appleFrames.filter(
+      (frame) => selectedCatalogCategory === "all" || frame.category === selectedCatalogCategory
+    );
+
+    const phoneFrames = filteredFrames.filter(f => f.category === "phone");
+    const tabletFrames = filteredFrames.filter(f => f.category === "tablet");
+    const laptopFrames = filteredFrames.filter(f => f.category === "laptop");
+    const desktopFrames = filteredFrames.filter(f => f.category === "desktop");
+
+    // Brand sub-groups
+    const applePhones = phoneFrames.filter(f => f.brand === "Apple");
+    const googlePhones = phoneFrames.filter(f => f.brand === "Google");
+    
+    const appleLaptops = laptopFrames.filter(f => f.brand === "Apple");
+    const dellLaptops = laptopFrames.filter(f => f.brand === "Dell");
+
+    return (
+      <div className="space-y-8">
+        {selectedCatalogCategory === "all" && (
+          <div>
+            <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="size-2 rounded-full bg-primary" />
+                <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">Standard Window</h3>
+              </div>
+              <span className="text-[9px] text-zinc-500 font-medium">Browser Frames</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Card 1: Browser Frame */}
+              <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-zinc-750 transition group">
+                <div className="aspect-video w-full rounded-lg bg-zinc-950 flex flex-col items-center justify-center p-3 relative overflow-hidden mb-3 border border-zinc-850">
+                  {/* Miniature Browser */}
+                  <div className="w-[90%] border border-zinc-800 bg-zinc-900 rounded shadow-lg overflow-hidden flex flex-col">
+                    <div className="flex items-center gap-0.5 px-1 py-0.5 border-b border-zinc-850 bg-zinc-950 shrink-0">
+                      <span className="size-0.5 rounded-full bg-red-500" />
+                      <span className="size-0.5 rounded-full bg-yellow-500" />
+                      <span className="size-0.5 rounded-full bg-green-500" />
+                    </div>
+                    <div className="aspect-video bg-gradient-to-br from-zinc-700/20 to-zinc-900/20" />
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold">Standard Browser</h4>
+                  <p className="text-[9px] text-zinc-500 mt-0.5">Desktop Browser Window</p>
+                  <Button 
+                    size="xs" 
+                    className="w-full mt-3 h-7 text-[10px] cursor-pointer"
+                    onClick={() => {
+                      dispatch({
+                        type: "update",
+                        payload: {
+                          deviceType: "desktop",
+                          frameStyle: "browser-dark"
+                        }
+                      });
+                      setIsDeviceCatalogOpen(false);
+                      toast.success("Applied Browser frame!");
+                    }}
+                  >
+                    Select Frame
+                  </Button>
+                </div>
+              </div>
+
+              {/* Card 2: Pro Display XDR */}
+              {renderFrameCatalogCard(appleFrames.find(f => f.id === "pro-display-xdr")!)}
+            </div>
+          </div>
+        )}
+
+        {/* --- PHONES SECTION --- */}
+        {selectedCatalogCategory === "phone" && (
+          <div className="space-y-6">
+            {applePhones.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+                  <div className="flex items-center gap-2">
+                    <svg className="size-3.5 fill-current text-zinc-400" viewBox="0 0 170 170">
+                      <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.92-14.37-6.15-2.82-2.38-6.53-6.83-11.1-13.36-7.85-11.4-13.91-23.75-18.17-37.06-4.26-13.31-6.39-25.56-6.39-36.78 0-16.14 3.96-29.28 11.89-39.41 7.92-10.13 18.06-15.34 30.41-15.65 5.66 0 11.55 1.76 17.67 5.27 6.13 3.51 10.42 5.27 12.88 5.27 1.95 0 6-1.57 12.16-4.7 6.16-3.14 11.85-4.66 17.07-4.56 12.39.4 22.39 4.96 29.98 13.68 5.92 6.95 10.04 15.11 12.37 24.5-13.99 5.75-20.9 15.66-20.73 29.74.17 11.04 4.3 20.15 12.39 27.32 8.09 7.17 17.67 11.02 28.74 11.56-2.2 6.07-4.42 11.5-6.66 16.3zm-38.37-124.9c0 8.09-3 15.71-9.01 22.86-6 7.15-13.36 11.52-22.09 13.1-1-8.31 2-16.14 8.03-23.47 6.03-7.33 13.56-11.54 22.59-12.63.48.14.48.14.48.14z"/>
+                    </svg>
+                    <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">iPhone Collection</h3>
+                  </div>
+                  <span className="bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-medium text-[9px]">iOS</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {applePhones.map(frame => renderFrameCatalogCard(frame))}
+                </div>
+              </div>
+            )}
+
+            {googlePhones.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+                  <div className="flex items-center gap-2">
+                    <svg className="size-3.5 fill-current text-zinc-400" viewBox="0 0 24 24">
+                      <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18 8.448 18 5.37 14.922 5.37 11.13s3.078-6.87 6.87-6.87c1.785 0 3.398.643 4.67 1.857l2.42-2.42C17.382 1.83 14.957 1 12.24 1a10.13 10.13 0 0 0-10.13 10.13 10.13 10.13 0 0 0 10.13 10.13c5.385 0 9.77-3.9 9.77-9.77 0-.61-.054-1.2-.162-1.77h-9.608z"/>
+                    </svg>
+                    <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">Google Pixel Collection</h3>
+                  </div>
+                  <span className="bg-sky-500/10 text-sky-400 px-2 py-0.5 rounded-full font-medium text-[9px]">Android</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {googlePhones.map(frame => renderFrameCatalogCard(frame))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {selectedCatalogCategory === "all" && phoneFrames.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+              <div className="flex items-center gap-2">
+                <svg className="size-3.5 fill-current text-zinc-400" viewBox="0 0 170 170">
+                  <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.92-14.37-6.15-2.82-2.38-6.53-6.83-11.1-13.36-7.85-11.4-13.91-23.75-18.17-37.06-4.26-13.31-6.39-25.56-6.39-36.78 0-16.14 3.96-29.28 11.89-39.41 7.92-10.13 18.06-15.34 30.41-15.65 5.66 0 11.55 1.76 17.67 5.27 6.13 3.51 10.42 5.27 12.88 5.27 1.95 0 6-1.57 12.16-4.7 6.16-3.14 11.85-4.66 17.07-4.56 12.39.4 22.39 4.96 29.98 13.68 5.92 6.95 10.04 15.11 12.37 24.5-13.99 5.75-20.9 15.66-20.73 29.74.17 11.04 4.3 20.15 12.39 27.32 8.09 7.17 17.67 11.02 28.74 11.56-2.2 6.07-4.42 11.5-6.66 16.3zm-38.37-124.9c0 8.09-3 15.71-9.01 22.86-6 7.15-13.36 11.52-22.09 13.1-1-8.31 2-16.14 8.03-23.47 6.03-7.33 13.56-11.54 22.59-12.63.48.14.48.14.48.14z"/>
+                </svg>
+                <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">iOS & Android Smartphones</h3>
+              </div>
+              <span className="text-[9px] text-zinc-500 font-medium">Smartphones</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {phoneFrames.map(frame => renderFrameCatalogCard(frame))}
+            </div>
+          </div>
+        )}
+
+        {/* --- TABLETS SECTION --- */}
+        {tabletFrames.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+              <div className="flex items-center gap-2">
+                <svg className="size-3.5 fill-current text-zinc-400" viewBox="0 0 170 170">
+                  <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.92-14.37-6.15-2.82-2.38-6.53-6.83-11.1-13.36-7.85-11.4-13.91-23.75-18.17-37.06-4.26-13.31-6.39-25.56-6.39-36.78 0-16.14 3.96-29.28 11.89-39.41 7.92-10.13 18.06-15.34 30.41-15.65 5.66 0 11.55 1.76 17.67 5.27 6.13 3.51 10.42 5.27 12.88 5.27 1.95 0 6-1.57 12.16-4.7 6.16-3.14 11.85-4.66 17.07-4.56 12.39.4 22.39 4.96 29.98 13.68 5.92 6.95 10.04 15.11 12.37 24.5-13.99 5.75-20.9 15.66-20.73 29.74.17 11.04 4.3 20.15 12.39 27.32 8.09 7.17 17.67 11.02 28.74 11.56-2.2 6.07-4.42 11.5-6.66 16.3zm-38.37-124.9c0 8.09-3 15.71-9.01 22.86-6 7.15-13.36 11.52-22.09 13.1-1-8.31 2-16.14 8.03-23.47 6.03-7.33 13.56-11.54 22.59-12.63.48.14.48.14.48.14z"/>
+                </svg>
+                <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">iPad Series</h3>
+              </div>
+              <span className="text-[9px] text-zinc-500 font-medium">Tablets</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {tabletFrames.map(frame => renderFrameCatalogCard(frame))}
+            </div>
+          </div>
+        )}
+
+        {/* --- LAPTOPS SECTION --- */}
+        {selectedCatalogCategory === "laptop" && (
+          <div className="space-y-6">
+            {appleLaptops.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+                  <div className="flex items-center gap-2">
+                    <svg className="size-3.5 fill-current text-zinc-400" viewBox="0 0 170 170">
+                      <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.34.13-9.13-1.92-14.37-6.15-2.82-2.38-6.53-6.83-11.1-13.36-7.85-11.4-13.91-23.75-18.17-37.06-4.26-13.31-6.39-25.56-6.39-36.78 0-16.14 3.96-29.28 11.89-39.41 7.92-10.13 18.06-15.34 30.41-15.65 5.66 0 11.55 1.76 17.67 5.27 6.13 3.51 10.42 5.27 12.88 5.27 1.95 0 6-1.57 12.16-4.7 6.16-3.14 11.85-4.66 17.07-4.56 12.39.4 22.39 4.96 29.98 13.68 5.92 6.95 10.04 15.11 12.37 24.5-13.99 5.75-20.9 15.66-20.73 29.74.17 11.04 4.3 20.15 12.39 27.32 8.09 7.17 17.67 11.02 28.74 11.56-2.2 6.07-4.42 11.5-6.66 16.3zm-38.37-124.9c0 8.09-3 15.71-9.01 22.86-6 7.15-13.36 11.52-22.09 13.1-1-8.31 2-16.14 8.03-23.47 6.03-7.33 13.56-11.54 22.59-12.63.48.14.48.14.48.14z"/>
+                    </svg>
+                    <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">MacBook Lineup</h3>
+                  </div>
+                  <span className="text-[9px] text-zinc-500 font-medium">macOS Laptops</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {appleLaptops.map(frame => renderFrameCatalogCard(frame))}
+                </div>
+              </div>
+            )}
+
+            {dellLaptops.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-bold border border-zinc-700 px-1 py-0.2 rounded-xs text-zinc-400 font-mono">DELL</span>
+                    <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">Dell XPS Collection</h3>
+                  </div>
+                  <span className="bg-zinc-750 text-zinc-400 px-2 py-0.5 rounded-full font-medium text-[9px]">Windows</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {dellLaptops.map(frame => renderFrameCatalogCard(frame))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {selectedCatalogCategory === "all" && laptopFrames.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+              <div className="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 shrink-0">
+                  <path d="M20 16V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12"/>
+                  <path d="M2 20h20"/>
+                  <path d="M12 16v4"/>
+                </svg>
+                <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">Premium Laptops</h3>
+              </div>
+              <span className="text-[9px] text-zinc-500 font-medium">Laptops</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {laptopFrames.map(frame => renderFrameCatalogCard(frame))}
+            </div>
+          </div>
+        )}
+
+        {/* --- DESKTOPS SECTION --- */}
+        {desktopFrames.length > 0 && (selectedCatalogCategory === "desktop" || selectedCatalogCategory === "all") && (
+          <div>
+            <div className="flex items-center justify-between mb-3.5 border-b border-zinc-800 pb-1.5">
+              <div className="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-400 shrink-0">
+                  <rect width="20" height="14" x="2" y="3" rx="2"/>
+                  <line x1="8" x2="16" y1="21" y2="21"/>
+                  <line x1="12" x2="12" y1="17" y2="21"/>
+                </svg>
+                <h3 className="text-xs font-semibold tracking-wide text-zinc-300 uppercase">Mac & Desktop displays</h3>
+              </div>
+              <span className="text-[9px] text-zinc-500 font-medium">Monitors & Desktops</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {desktopFrames.map(frame => renderFrameCatalogCard(frame))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const renderBackgroundAndColorsControls = () => {
     return (
@@ -1548,21 +2235,25 @@ export default function Page() {
 
   const renderDeviceFrameControls = () => {
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-4 text-xs">
         {/* Device Type Select */}
-        <div>
-          <span className="text-[10px] text-muted-foreground block mb-1">Device Mockup Type</span>
-          <div className="grid grid-cols-2 gap-1.5">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            <span>Device Mockup Type</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
             {(["desktop", "mobile"] as const).map((device) => {
               const active = (state.present.deviceType ?? "desktop") === device;
               return (
                 <Button
                   key={device}
                   variant={active ? "default" : "outline"}
-                  size="xs"
-                  className="text-[10px] h-7 capitalize cursor-pointer"
+                  size="sm"
+                  className={cn(
+                    "h-9 text-[11px] font-medium cursor-pointer transition flex items-center justify-center gap-1.5",
+                    active ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted/40"
+                  )}
                   onClick={() => {
-                    // Map frame style automatically when switching device
                     let nextFrameStyle: EditorState["frameStyle"] = "none";
                     const currentStyle = state.present.frameStyle ?? "none";
                     if (device === "mobile") {
@@ -1583,7 +2274,24 @@ export default function Page() {
                     });
                   }}
                 >
-                  {device === "desktop" ? "Desktop Browser" : "Mobile Phone"}
+                  {device === "desktop" ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                        <rect width="20" height="14" x="2" y="3" rx="2"/>
+                        <line x1="8" x2="16" y1="21" y2="21"/>
+                        <line x1="12" x2="12" y1="17" y2="21"/>
+                      </svg>
+                      <span>Desktop</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                        <rect width="14" height="20" x="5" y="2" rx="2" ry="2"/>
+                        <path d="M12 18h.01"/>
+                      </svg>
+                      <span>Mobile</span>
+                    </>
+                  )}
                 </Button>
               );
             })}
@@ -1591,24 +2299,45 @@ export default function Page() {
         </div>
 
         {/* Bezel Style Select */}
-        <div>
-          <span className="text-[10px] text-muted-foreground block mb-1">Frame Bezel Style</span>
-          <div className="grid grid-cols-3 gap-1.5">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+            <span>Frame Bezel Style</span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
             {state.present.deviceType === "mobile" ? (
-              // Mobile options
               (["none", "phone-light", "phone-dark"] as const).map((styleName) => {
                 const currentStyle = state.present.frameStyle ?? "none";
                 const active = currentStyle === styleName;
                 let label = "None";
-                if (styleName === "phone-light") label = "Light Phone";
-                if (styleName === "phone-dark") label = "Dark Phone";
+                let icon = null;
+                if (styleName === "phone-light") {
+                  label = "Light";
+                  icon = (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                      <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                    </svg>
+                  );
+                } else if (styleName === "phone-dark") {
+                  label = "Dark";
+                  icon = (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                    </svg>
+                  );
+                } else {
+                  icon = (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0">
+                      <rect width="18" height="18" x="3" y="3" rx="2"/>
+                    </svg>
+                  );
+                }
 
                 return (
                   <Button
                     key={styleName}
                     variant={active ? "default" : "outline"}
-                    size="xs"
-                    className="text-[10px] h-7.5 px-1 leading-none cursor-pointer"
+                    size="sm"
+                    className="text-[11px] h-8.5 px-1 leading-none cursor-pointer flex items-center justify-center gap-1"
                     onClick={() =>
                       dispatch({
                         type: "update",
@@ -1616,25 +2345,45 @@ export default function Page() {
                       })
                     }
                   >
-                    {label}
+                    {icon}
+                    <span>{label}</span>
                   </Button>
                 );
               })
             ) : (
-              // Desktop options
               (["none", "browser-light", "browser-dark"] as const).map((styleName) => {
                 const currentStyle = state.present.frameStyle ?? "none";
                 const active = currentStyle === styleName;
                 let label = "None";
-                if (styleName === "browser-light") label = "Light Window";
-                if (styleName === "browser-dark") label = "Dark Window";
+                let icon = null;
+                if (styleName === "browser-light") {
+                  label = "Light";
+                  icon = (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                      <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                    </svg>
+                  );
+                } else if (styleName === "browser-dark") {
+                  label = "Dark";
+                  icon = (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+                      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                    </svg>
+                  );
+                } else {
+                  icon = (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="shrink-0">
+                      <rect width="18" height="18" x="3" y="3" rx="2"/>
+                    </svg>
+                  );
+                }
 
                 return (
                   <Button
                     key={styleName}
                     variant={active ? "default" : "outline"}
-                    size="xs"
-                    className="text-[10px] h-7.5 px-1 leading-none cursor-pointer"
+                    size="sm"
+                    className="text-[11px] h-8.5 px-1 leading-none cursor-pointer flex items-center justify-center gap-1"
                     onClick={() =>
                       dispatch({
                         type: "update",
@@ -1642,12 +2391,52 @@ export default function Page() {
                       })
                     }
                   >
-                    {label}
+                    {icon}
+                    <span>{label}</span>
                   </Button>
                 );
               })
             )}
           </div>
+        </div>
+
+        {/* Choose Device Frame Catalog Trigger */}
+        <div className="pt-2.5 border-t border-border/40 mt-1 flex flex-col gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsDeviceCatalogOpen(true)}
+            className="w-full text-[11px] h-9 font-medium flex items-center justify-center gap-1.5 cursor-pointer bg-primary/5 hover:bg-primary/10 border-primary/20 text-foreground"
+          >
+            <IconDeviceLaptop className="size-4 text-primary animate-pulse" />
+            Choose Device Frame...
+          </Button>
+
+          {state.present.frameStyle === "custom-device" && state.present.selectedFrame && (
+            <div className="p-2 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-between animate-in fade-in slide-in-from-top-1">
+              <div className="flex flex-col gap-0.5 min-w-0">
+                <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-wider">Active Device</span>
+                <span className="text-[10px] font-medium text-foreground truncate">
+                  {appleFrames.find(f => f.id === state.present.selectedFrame?.id)?.name} ({state.present.selectedFrame.color})
+                </span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => {
+                  dispatch({
+                    type: "update",
+                    payload: {
+                      frameStyle: "none"
+                    }
+                  });
+                }}
+                className="size-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md shrink-0 cursor-pointer"
+                title="Remove custom frame"
+              >
+                <IconX className="size-3.5" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -1743,7 +2532,7 @@ export default function Page() {
     <main className="flex h-svh w-svw flex-col overflow-hidden">
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <SidebarProvider style={{ minHeight: "100%", height: "100%" }} className="overflow-hidden">
-          <Sidebar className="w-72 hidden lg:flex">
+          <Sidebar className="w-72 hidden lg:flex" style={{ "--sidebar-width": "18rem" } as React.CSSProperties}>
             <SidebarContent className="flex h-full flex-col p-2">
               {renderBackgroundAndColorsControls()}
             </SidebarContent>
@@ -1887,7 +2676,48 @@ export default function Page() {
               >
                 {renderBackground()}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  {state.present.deviceType === "mobile" ? (
+                  {state.present.frameStyle === "custom-device" && state.present.selectedFrame ? (
+                    (() => {
+                      const frame = appleFrames.find(f => f.id === state.present.selectedFrame?.id);
+                      const category = frame?.category ?? "phone";
+                      return (
+                        <div
+                          className={cn(
+                            "mockup-card transition-all duration-300 relative flex flex-col items-center justify-center",
+                            (category === "laptop" || category === "desktop") ? (
+                              canvasRatio === "16-9" ? "w-[80%] max-w-4xl" :
+                              canvasRatio === "4-3" ? "w-[82%] max-w-3xl" :
+                              canvasRatio === "1-1" ? "w-[85%] max-w-2xl" :
+                              "w-[90%] max-w-md"
+                            ) : category === "tablet" ? (
+                              canvasRatio === "16-9" ? "w-[40%] max-w-[380px]" :
+                              canvasRatio === "4-3" ? "w-[48%] max-w-[420px]" :
+                              canvasRatio === "1-1" ? "w-[58%] max-w-[460px]" :
+                              "w-[75%] max-w-[360px]"
+                            ) : (
+                              // Phone & Watch
+                              canvasRatio === "16-9" ? "w-[24%] max-w-[220px]" :
+                              canvasRatio === "4-3" ? "w-[30%] max-w-[240px]" :
+                              canvasRatio === "1-1" ? "w-[48%] max-w-[260px]" :
+                              "w-[75%] max-w-[280px]"
+                            )
+                          )}
+                      style={{
+                        transform: `
+                          perspective(${screenshotPerspective}px)
+                          translate(${screenshotX}px, ${screenshotY}px)
+                          rotateX(${screenshotRotateX}deg)
+                          rotateY(${screenshotRotateY}deg)
+                          rotateZ(${screenshotRotateZ}deg)
+                          scale(${screenshotZoom})
+                        `,
+                      }}
+                    >
+                      {renderCustomAppleFrame(state.present.selectedFrame.id, state.present.selectedFrame.color)}
+                        </div>
+                      );
+                    })()
+                  ) : state.present.deviceType === "mobile" ? (
                     /* Mobile Mockup Card */
                     <div
                       className={cn(
@@ -2146,7 +2976,7 @@ export default function Page() {
             </Drawer>
           </main>
 
-          <Sidebar side="right" className="w-80 border-l border-border/50 hidden lg:flex">
+          <Sidebar side="right" className="w-80 border-l border-border/50 hidden lg:flex" style={{ "--sidebar-width": "20rem" } as React.CSSProperties}>
             <SidebarContent className="flex h-full flex-col p-3 gap-3 overflow-hidden">
               {/* Header Action Bar */}
               <div className="flex flex-col gap-2 shrink-0 pb-2 border-b border-border/40">
@@ -2323,7 +3153,48 @@ export default function Page() {
           >
             {renderBackground()}
             <div className="absolute inset-0 flex items-center justify-center">
-              {state.present.deviceType === "mobile" ? (
+              {state.present.frameStyle === "custom-device" && state.present.selectedFrame ? (
+                (() => {
+                  const frame = appleFrames.find(f => f.id === state.present.selectedFrame?.id);
+                  const category = frame?.category ?? "phone";
+                  return (
+                    <div
+                      className={cn(
+                        "mockup-card transition-all duration-300 relative flex flex-col items-center justify-center",
+                        (category === "laptop" || category === "desktop") ? (
+                          canvasRatio === "16-9" ? "w-[80%] max-w-4xl" :
+                          canvasRatio === "4-3" ? "w-[82%] max-w-3xl" :
+                          canvasRatio === "1-1" ? "w-[85%] max-w-2xl" :
+                          "w-[90%] max-w-md"
+                        ) : category === "tablet" ? (
+                          canvasRatio === "16-9" ? "w-[40%] max-w-[380px]" :
+                          canvasRatio === "4-3" ? "w-[48%] max-w-[420px]" :
+                          canvasRatio === "1-1" ? "w-[58%] max-w-[460px]" :
+                          "w-[75%] max-w-[360px]"
+                        ) : (
+                          // Phone & Watch
+                          canvasRatio === "16-9" ? "w-[24%] max-w-[220px]" :
+                          canvasRatio === "4-3" ? "w-[30%] max-w-[240px]" :
+                          canvasRatio === "1-1" ? "w-[48%] max-w-[260px]" :
+                          "w-[75%] max-w-[280px]"
+                        )
+                      )}
+                      style={{
+                        transform: `
+                          perspective(${screenshotPerspective}px)
+                          translate(${screenshotX}px, ${screenshotY}px)
+                          rotateX(${screenshotRotateX}deg)
+                          rotateY(${screenshotRotateY}deg)
+                          rotateZ(${screenshotRotateZ}deg)
+                          scale(${screenshotZoom})
+                        `,
+                      }}
+                    >
+                      {renderCustomAppleFrame(state.present.selectedFrame.id, state.present.selectedFrame.color)}
+                    </div>
+                  );
+                })()
+              ) : state.present.deviceType === "mobile" ? (
                 /* Mobile Mockup Card */
                 <div
                   className="mockup-card w-[42%] max-w-[260px] overflow-hidden drop-shadow-[0_30px_50px_rgba(0,0,0,.45)] flex flex-col transition-all duration-300 relative border-black"
@@ -2398,6 +3269,56 @@ export default function Page() {
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Device Catalog Dialog */}
+      {isDeviceCatalogOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div className="relative bg-[#1c1c1f] text-zinc-100 rounded-3xl border border-zinc-800 shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-zinc-800/60 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold tracking-wide text-zinc-200">Mockup / Frame</span>
+                <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full font-mono">Apple Collection</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsDeviceCatalogOpen(false)}
+                className="size-8 rounded-full text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 cursor-pointer"
+              >
+                <IconX className="size-4" />
+              </Button>
+            </div>
+
+            {/* Categories Bar */}
+            <div className="flex items-center gap-1.5 px-6 py-3 border-b border-zinc-800/40 bg-zinc-950/20 overflow-x-auto select-none scrollbar-none">
+              {catalogCategories.map((cat) => {
+                const active = selectedCatalogCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCatalogCategory(cat.id as any)}
+                    className={cn(
+                      "h-8 px-4 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all shrink-0 cursor-pointer",
+                      active 
+                        ? "bg-zinc-100 text-zinc-950 font-semibold" 
+                        : "bg-zinc-900 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800"
+                    )}
+                  >
+                    {cat.icon}
+                    <span>{cat.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Scrollable List */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-8 min-h-0">
+              {renderCatalogSections()}
             </div>
           </div>
         </div>
