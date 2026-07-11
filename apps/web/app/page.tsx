@@ -49,6 +49,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerClose,
+} from "@workspace/ui/components/drawer";
 import { useEffect, useReducer, useState } from "react";
 import html2canvas from "html2canvas";
 import { toast, Toaster } from "sonner";
@@ -510,6 +517,7 @@ export default function Page() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
+  const [activeMobileDrawer, setActiveMobileDrawer] = useState<"canvas" | "layouts" | "device" | "adjust" | "export" | null>(null);
   
   const [sectionsExpanded, setSectionsExpanded] = useState({
     layouts: true,
@@ -829,6 +837,889 @@ export default function Page() {
       updateScreenshot({ [key]: value[0] ?? fallback });
     };
 
+  const renderBackgroundAndColorsControls = () => {
+    return (
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="flex h-full flex-col min-h-0">
+        <TabsList className="grid w-full grid-cols-2 shrink-0">
+          <TabsTrigger
+            value="background"
+            className="data-active:border-none! data-active:bg-card! data-active:text-card-foreground!"
+          >
+            <IconStackForward className="size-4 mr-1.5" />
+            Background
+          </TabsTrigger>
+          <TabsTrigger
+            value="colors"
+            className="data-active:border-none! data-active:bg-card! data-active:text-card-foreground!"
+          >
+            <IconPaintFilled className="size-4 mr-1.5" />
+            Colors
+          </TabsTrigger>
+        </TabsList>
+        <div className="min-h-0 flex-1 pt-2 flex flex-col">
+          <TabsContent value="background" className="h-full flex flex-col min-h-0 flex-1">
+            <ScrollArea className="flex-1 min-h-0">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                const categoryBackgrounds = backgrounds.filter(
+                  (bg) => bg.category === category.id
+                );
+
+                return (
+                  <div key={category.id} className="mb-4">
+                    <div className="flex items-center gap-1 text-sm opacity-80">
+                      <Icon className="size-4" />
+                      <span>{category.label}</span>
+                    </div>
+
+                    <div className="mt-1.5 flex w-full flex-wrap">
+                      {categoryBackgrounds.slice(0, 11).map((bg) => (
+                        <button
+                          key={bg.backgroundUrl}
+                          type="button"
+                          className="p-1"
+                          onClick={() =>
+                            handleBackgroundImageSelection(
+                              bg.backgroundUrl
+                            )
+                          }
+                          aria-label={`Use ${bg.name}`}
+                        >
+                          <img
+                            src={bg.previewUrl}
+                            alt=""
+                            className={cn(
+                              "size-9 rounded-md transition",
+                              state.present.backgroundType === "image" &&
+                                state.present.background ===
+                                  bg.backgroundUrl
+                                ? "ring-2 ring-primary"
+                                : "hover:ring-2 hover:ring-primary/50"
+                            )}
+                          />
+                        </button>
+                      ))}
+
+                      {categoryBackgrounds.length > 11 && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="m-1 size-9 rounded-md text-xs"
+                            >
+                              +{categoryBackgrounds.length - 11}
+                            </Button>
+                          </PopoverTrigger>
+
+                          <PopoverContent
+                            side="bottom"
+                            align="start"
+                            className="w-72 p-3"
+                          >
+                            <div className="mb-1 flex items-center justify-between">
+                              <span className="text-sm font-medium">
+                                {category.label}
+                              </span>
+
+                              <span className="text-xs text-muted-foreground">
+                                {categoryBackgrounds.length}
+                              </span>
+                            </div>
+
+                            <ScrollArea className="h-72">
+                              <div className="flex flex-wrap gap-2 pr-2">
+                                {categoryBackgrounds.map((bg) => (
+                                  <button
+                                    key={bg.backgroundUrl}
+                                    type="button"
+                                    onClick={() =>
+                                      handleBackgroundImageSelection(
+                                        bg.backgroundUrl
+                                      )
+                                    }
+                                    aria-label={`Use ${bg.name}`}
+                                  >
+                                    <img
+                                      src={bg.previewUrl}
+                                      alt=""
+                                      className={cn(
+                                        "size-9 rounded-md transition",
+                                        state.present.backgroundType ===
+                                          "image" &&
+                                          state.present.background ===
+                                            bg.backgroundUrl
+                                          ? "ring-2 ring-primary"
+                                          : "hover:ring-2 hover:ring-primary/50"
+                                      )}
+                                    />
+                                  </button>
+                                ))}
+                              </div>
+                            </ScrollArea>
+                          </PopoverContent>
+                        </Popover>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="colors" className="h-full flex flex-col min-h-0 flex-1">
+            <div className="flex flex-col h-full min-h-0 pr-1 flex-1">
+              {/* Sub-tab selection */}
+              <div className="flex border-b border-border/40 pb-2 mb-3 gap-1 shrink-0">
+                {(["presets", "custom", "saved"] as const).map((tab) => {
+                  let label = "Presets";
+                  if (tab === "custom") label = "Custom";
+                  if (tab === "saved") label = "Saved";
+
+                  const active = colorSubTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => setColorSubTab(tab)}
+                      className={cn(
+                        "flex-1 pb-1.5 pt-1 text-center text-xs font-medium border-b-2 transition-all",
+                        active
+                          ? "border-primary text-foreground"
+                          : "border-transparent text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <ScrollArea className="flex-1 min-h-0">
+                {colorSubTab === "presets" && (
+                  <div className="space-y-6 pr-2">
+                    {/* Solids Section */}
+                    <div>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+                        <span>Solid Presets</span>
+                        <span className="text-[10px] text-muted-foreground/80 font-normal">{solidPresets.length}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {solidPresets.map((color) => {
+                          const isSelected =
+                            state.present.backgroundType === "color" &&
+                            state.present.background === color.value;
+
+                          return (
+                            <button
+                              key={color.name}
+                              type="button"
+                              className={cn(
+                                "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
+                                isSelected
+                                  ? "border-primary ring-2 ring-primary/20"
+                                  : "border-border hover:border-primary/50"
+                              )}
+                              onClick={() => handleColorSelection(color.value)}
+                            >
+                              <span
+                                className="mb-1.5 block h-10 rounded-md border border-black/5"
+                                style={{ background: color.value }}
+                              />
+                              <span className="block truncate text-[11px] font-medium">
+                                {color.name}
+                              </span>
+                              {isSelected && (
+                                <span className="absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
+                                  <IconCheck className="size-3" />
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Gradients Section */}
+                    <div>
+                      <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+                        <span>Gradient Presets</span>
+                        <span className="text-[10px] text-muted-foreground/80 font-normal">{gradientPresets.length}</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {gradientPresets.map((color) => {
+                          const isSelected =
+                            state.present.backgroundType === "color" &&
+                            state.present.background === color.value;
+
+                          return (
+                            <button
+                              key={color.name}
+                              type="button"
+                              className={cn(
+                                "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
+                                isSelected
+                                  ? "border-primary ring-2 ring-primary/20"
+                                  : "border-border hover:border-primary/50"
+                              )}
+                              onClick={() => handleColorSelection(color.value)}
+                            >
+                              <span
+                                className="mb-1.5 block h-10 rounded-md border border-black/5"
+                                style={{ background: color.value }}
+                              />
+                              <span className="block truncate text-[11px] font-medium">
+                                {color.name}
+                              </span>
+                              {isSelected && (
+                                <span className="absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
+                                  <IconCheck className="size-3" />
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Legacy Custom Color - as simple quick picker */}
+                    <div className="rounded-lg border bg-card p-3">
+                      <Label htmlFor="custom-color" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 block">
+                        Quick Custom Color
+                      </Label>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="relative size-9 shrink-0 rounded-md overflow-hidden border border-border cursor-pointer">
+                          <input
+                            id="custom-color"
+                            type="color"
+                            value={customColor}
+                            onChange={(event) => {
+                              setCustomColor(event.target.value);
+                              handleColorSelection(event.target.value);
+                            }}
+                            className="absolute inset-0 size-full cursor-pointer opacity-0"
+                            aria-label="Choose custom background color"
+                          />
+                          <div className="size-full" style={{ backgroundColor: customColor }} />
+                        </div>
+                        <Input
+                          value={customColor}
+                          onChange={(event) => setCustomColor(event.target.value)}
+                          onBlur={() => handleColorSelection(customColor)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              handleColorSelection(customColor);
+                            }
+                          }}
+                          placeholder="#f8fafc"
+                          className="font-mono text-xs h-9"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {colorSubTab === "custom" && (
+                  <div className="space-y-4 pr-2">
+                    {/* Preview box */}
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1.5 block">Gradient Preview</Label>
+                      <div
+                        className="h-14 w-full rounded-lg border border-border shadow-inner"
+                        style={{
+                          background: compileGradient(
+                            gradientType,
+                            gradientAngle,
+                            radialShape,
+                            radialPosition,
+                            radialX,
+                            radialY,
+                            gradientStops
+                          ),
+                        }}
+                      />
+                    </div>
+
+                    {/* Gradient Type */}
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1.5 block">Gradient Type</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(["linear", "radial"] as const).map((type) => (
+                          <Button
+                            key={type}
+                            type="button"
+                            variant={gradientType === type ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setGradientType(type)}
+                            className="text-xs h-8 capitalize"
+                          >
+                            {type}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Linear Controls */}
+                    {gradientType === "linear" && (
+                      <div className="py-2 border-y border-border/30">
+                        <SliderDemo
+                          label="Angle"
+                          value={[gradientAngle]}
+                          setValue={(val) => setGradientAngle(val[0] ?? 0)}
+                          min={0}
+                          max={360}
+                          step={1}
+                          unit="°"
+                        />
+                      </div>
+                    )}
+
+                    {/* Radial Controls */}
+                    {gradientType === "radial" && (
+                      <div className="space-y-4 py-2 border-y border-border/30">
+                        <div>
+                          <Label className="text-[11px] text-muted-foreground mb-1.5 block">Radial Shape</Label>
+                          <div className="grid grid-cols-2 gap-2">
+                            {(["circle", "ellipse"] as const).map((shape) => (
+                              <Button
+                                key={shape}
+                                type="button"
+                                variant={radialShape === shape ? "default" : "outline"}
+                                size="xs"
+                                onClick={() => setRadialShape(shape)}
+                                className="text-[11px] h-7 capitalize"
+                              >
+                                {shape}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <Label className="text-[11px] text-muted-foreground mb-1.5 block">Position Preset</Label>
+                          <div className="grid grid-cols-3 gap-1">
+                            {[
+                              { id: "top left", label: "Top L" },
+                              { id: "top", label: "Top" },
+                              { id: "top right", label: "Top R" },
+                              { id: "left", label: "Left" },
+                              { id: "center", label: "Center" },
+                              { id: "right", label: "Right" },
+                              { id: "bottom left", label: "Bottom L" },
+                              { id: "bottom", label: "Bottom" },
+                              { id: "bottom right", label: "Bottom R" },
+                            ].map((pos) => (
+                              <Button
+                                key={pos.id}
+                                type="button"
+                                variant={radialPosition === pos.id ? "default" : "outline"}
+                                size="xs"
+                                onClick={() => setRadialPosition(pos.id)}
+                                className="text-[10px] h-6 px-1"
+                              >
+                                {pos.label}
+                              </Button>
+                            ))}
+                          </div>
+                          <Button
+                            type="button"
+                            variant={radialPosition === "custom" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setRadialPosition("custom")}
+                            className="text-[11px] w-full mt-2 h-7"
+                          >
+                            Custom Origin Offset
+                          </Button>
+                        </div>
+
+                        {radialPosition === "custom" && (
+                          <div className="space-y-4 p-2 rounded-lg border bg-zinc-950/20">
+                            <SliderDemo
+                              label="Origin X"
+                              value={[radialX]}
+                              setValue={(val) => setRadialX(val[0] ?? 50)}
+                              min={0}
+                              max={100}
+                              step={1}
+                              unit="%"
+                            />
+                            <SliderDemo
+                              label="Origin Y"
+                              value={[radialY]}
+                              setValue={(val) => setRadialY(val[0] ?? 50)}
+                              min={0}
+                              max={100}
+                              step={1}
+                              unit="%"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Color Stops Manager */}
+                    <div className="space-y-2.5">
+                      <Label className="text-xs text-muted-foreground block">Color Stops</Label>
+                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        {gradientStops.map((stop) => (
+                          <div key={stop.id} className="flex items-center gap-2.5">
+                            {/* Color Indicator */}
+                            <div className="relative size-8 shrink-0 rounded-md overflow-hidden border border-border shadow-xs cursor-pointer">
+                              <input
+                                type="color"
+                                value={stop.color}
+                                onChange={(e) => {
+                                  const newStops = gradientStops.map((s) =>
+                                    s.id === stop.id ? { ...s, color: e.target.value } : s
+                                  );
+                                  setGradientStops(newStops);
+                                }}
+                                className="absolute inset-0 size-full cursor-pointer opacity-0"
+                              />
+                              <div className="size-full" style={{ backgroundColor: stop.color }} />
+                            </div>
+
+                            {/* Position range slider */}
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={stop.position}
+                              onChange={(e) => {
+                                  const newStops = gradientStops.map((s) =>
+                                    s.id === stop.id ? { ...s, position: parseInt(e.target.value) } : s
+                                  );
+                                  setGradientStops(newStops);
+                              }}
+                              className="flex-1 min-w-0 accent-primary h-1 bg-muted rounded-lg appearance-none cursor-pointer"
+                            />
+
+                            {/* Precise percentage input */}
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={stop.position}
+                              onChange={(e) => {
+                                const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                                const newStops = gradientStops.map((s) =>
+                                  s.id === stop.id ? { ...s, position: val } : s
+                                );
+                                setGradientStops(newStops);
+                              }}
+                              className="w-14 text-center h-8 text-[11px] font-mono px-1! shrink-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+
+                            {/* Delete Stop */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                if (gradientStops.length > 2) {
+                                  setGradientStops(gradientStops.filter((s) => s.id !== stop.id));
+                                }
+                              }}
+                              disabled={gradientStops.length <= 2}
+                              className="size-8 text-muted-foreground hover:text-destructive shrink-0"
+                            >
+                              <IconTrash className="size-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full text-xs flex items-center justify-center gap-1 h-8 mt-2"
+                        onClick={() => {
+                          const id = Math.random().toString(36).substring(2, 9);
+                          const sorted = [...gradientStops].sort((a, b) => a.position - b.position);
+                          let newPos = 50;
+                          if (sorted.length >= 2) {
+                            let maxGap = -1;
+                            let insertAfter = 0;
+                            for (let i = 0; i < sorted.length - 1; i++) {
+                              const gap = sorted[i + 1]!.position - sorted[i]!.position;
+                              if (gap > maxGap) {
+                                maxGap = gap;
+                                insertAfter = i;
+                              }
+                            }
+                            newPos = Math.round((sorted[insertAfter]!.position + sorted[insertAfter + 1]!.position) / 2);
+                          }
+
+                          setGradientStops([
+                            ...gradientStops,
+                            { id, color: "#ffffff", position: newPos },
+                          ]);
+                        }}
+                      >
+                        <IconPlus className="size-3.5" />
+                        Add Color Stop
+                      </Button>
+                    </div>
+
+                    {/* Save to Presets */}
+                    <div className="pt-3 border-t border-border/30 mt-4 flex items-center justify-between gap-2">
+                      <Input
+                        placeholder="Preset Name"
+                        value={customPresetName}
+                        onChange={(e) => setCustomPresetName(e.target.value)}
+                        className="text-xs h-8 flex-1"
+                      />
+                      <Button
+                        type="button"
+                        onClick={saveToPresets}
+                        className="text-xs h-8 shrink-0 bg-primary/95 text-primary-foreground hover:bg-primary font-medium"
+                      >
+                        <IconHeart className="size-3.5 mr-1" />
+                        Save Preset
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {colorSubTab === "saved" && (
+                  <div className="space-y-4 pr-2">
+                    {savedPresets.length === 0 ? (
+                      <div className="text-center py-10 px-4 border border-dashed rounded-lg bg-card/40">
+                        <IconPalette className="size-8 text-muted-foreground/60 mx-auto mb-2" />
+                        <p className="text-xs font-semibold text-muted-foreground">No saved presets yet</p>
+                        <p className="text-[10px] text-muted-foreground/75 mt-1.5 leading-normal">
+                          Design a custom gradient on the "Custom" tab and click "Save Preset" to store it here.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2">
+                        {savedPresets.map((color, index) => {
+                          const isSelected =
+                            state.present.backgroundType === "color" &&
+                            state.present.background === color.value;
+
+                          return (
+                            <div
+                              key={index}
+                              className={cn(
+                                "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
+                                isSelected
+                                  ? "border-primary ring-2 ring-primary/20"
+                                  : "border-border hover:border-primary/50"
+                              )}
+                            >
+                              <button
+                                type="button"
+                                className="w-full text-left cursor-pointer"
+                                onClick={() => handleColorSelection(color.value)}
+                              >
+                                <span
+                                  className="mb-1.5 block h-10 rounded-md border border-black/5"
+                                  style={{ background: color.value }}
+                                />
+                                <span className="block truncate text-[11px] font-medium pr-5">
+                                  {color.name}
+                                </span>
+                              </button>
+
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  const newPresets = savedPresets.filter((_, i) => i !== index);
+                                  setSavedPresets(newPresets);
+                                  localStorage.setItem("mockup_custom_presets", JSON.stringify(newPresets));
+                                }}
+                                className="absolute right-1 bottom-1 size-5 text-muted-foreground hover:text-destructive rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <IconTrash className="size-3" />
+                              </Button>
+
+                              {isSelected && (
+                                <span className="absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
+                                  <IconCheck className="size-3" />
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          </TabsContent>
+        </div>
+      </Tabs>
+    );
+  };
+
+  const renderLayoutsControls = () => {
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        {mockupPresets.map((preset) => {
+          const active = isActivePreset(preset, state.present);
+          
+          return (
+            <button
+              key={preset.id}
+              type="button"
+              onClick={() => applyMockupPreset(preset)}
+              className={cn(
+                "group relative rounded-lg border bg-card p-1.5 text-left transition select-none cursor-pointer",
+                active
+                  ? "border-primary ring-1 ring-primary/20 bg-primary/5"
+                  : "border-border/60 hover:border-primary/50"
+              )}
+            >
+              <div className="relative mb-1.5 aspect-video overflow-hidden rounded-md bg-muted">
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      state.present.backgroundType === "color"
+                        ? state.present.background
+                        : `url(${state.present.background}) center/cover no-repeat`,
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div
+                    className="w-[72%] overflow-hidden border border-white/40 bg-background shadow-xl flex flex-col"
+                    style={{
+                      borderRadius: `${Math.max(
+                        preset.settings.radius / 3,
+                        4
+                      )}px`,
+                      padding: `${Math.min(
+                        preset.settings.padding / 4,
+                        8
+                      )}px`,
+                      transform: `
+                        perspective(${preset.settings.perspective / 2}px)
+                        translate(${preset.settings.x / 5}px, ${preset.settings.y / 5}px)
+                        rotateX(${preset.settings.rotateX}deg)
+                        rotateY(${preset.settings.rotateY}deg)
+                        rotateZ(${preset.settings.rotateZ}deg)
+                        scale(${preset.settings.zoom})
+                      `,
+                    }}
+                  >
+                    {preset.frameStyle && preset.frameStyle !== "none" && (
+                      <div
+                        className={cn(
+                          "flex h-2 w-full items-center justify-between border-b px-0.5 select-none shrink-0",
+                          preset.frameStyle === "browser-dark"
+                            ? "bg-zinc-900 border-zinc-800 text-[2px]"
+                            : "bg-zinc-100 border-zinc-200 text-[2px]"
+                        )}
+                      >
+                        <div className="flex items-center gap-0.5 w-1/3">
+                          <span className="size-0.5 rounded-full bg-red-400" />
+                          <span className="size-0.5 rounded-full bg-yellow-400" />
+                          <span className="size-0.5 rounded-full bg-green-400" />
+                        </div>
+                        <div className="h-0.5 w-5 rounded-xs bg-black/10" />
+                        <div className="w-1/3" />
+                      </div>
+                    )}
+                    <div className="aspect-video rounded-[inherit] bg-gradient-to-br from-foreground/60 via-foreground/20 to-background" />
+                  </div>
+                </div>
+                {active && (
+                  <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
+                    <IconCheck className="size-2.5" />
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0 px-0.5">
+                <div className="truncate text-[11px] font-medium leading-tight">
+                  {preset.name}
+                </div>
+                <div className="truncate text-[9px] text-muted-foreground mt-0.5">
+                  {preset.detail}
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderDeviceFrameControls = () => {
+    return (
+      <div className="flex flex-col gap-3">
+        {/* Device Type Select */}
+        <div>
+          <span className="text-[10px] text-muted-foreground block mb-1">Device Mockup Type</span>
+          <div className="grid grid-cols-2 gap-1.5">
+            {(["desktop", "mobile"] as const).map((device) => {
+              const active = (state.present.deviceType ?? "desktop") === device;
+              return (
+                <Button
+                  key={device}
+                  variant={active ? "default" : "outline"}
+                  size="xs"
+                  className="text-[10px] h-7 capitalize cursor-pointer"
+                  onClick={() => {
+                    // Map frame style automatically when switching device
+                    let nextFrameStyle: EditorState["frameStyle"] = "none";
+                    const currentStyle = state.present.frameStyle ?? "none";
+                    if (device === "mobile") {
+                      if (currentStyle === "browser-light") nextFrameStyle = "phone-light";
+                      if (currentStyle === "browser-dark") nextFrameStyle = "phone-dark";
+                      if (currentStyle === "none") nextFrameStyle = "none";
+                    } else {
+                      if (currentStyle === "phone-light") nextFrameStyle = "browser-light";
+                      if (currentStyle === "phone-dark") nextFrameStyle = "browser-dark";
+                      if (currentStyle === "none") nextFrameStyle = "none";
+                    }
+                    dispatch({
+                      type: "update",
+                      payload: {
+                        deviceType: device,
+                        frameStyle: nextFrameStyle,
+                      },
+                    });
+                  }}
+                >
+                  {device === "desktop" ? "Desktop Browser" : "Mobile Phone"}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Bezel Style Select */}
+        <div>
+          <span className="text-[10px] text-muted-foreground block mb-1">Frame Bezel Style</span>
+          <div className="grid grid-cols-3 gap-1.5">
+            {state.present.deviceType === "mobile" ? (
+              // Mobile options
+              (["none", "phone-light", "phone-dark"] as const).map((styleName) => {
+                const currentStyle = state.present.frameStyle ?? "none";
+                const active = currentStyle === styleName;
+                let label = "None";
+                if (styleName === "phone-light") label = "Light Phone";
+                if (styleName === "phone-dark") label = "Dark Phone";
+
+                return (
+                  <Button
+                    key={styleName}
+                    variant={active ? "default" : "outline"}
+                    size="xs"
+                    className="text-[10px] h-7.5 px-1 leading-none cursor-pointer"
+                    onClick={() =>
+                      dispatch({
+                        type: "update",
+                        payload: { frameStyle: styleName },
+                      })
+                    }
+                  >
+                    {label}
+                  </Button>
+                );
+              })
+            ) : (
+              // Desktop options
+              (["none", "browser-light", "browser-dark"] as const).map((styleName) => {
+                const currentStyle = state.present.frameStyle ?? "none";
+                const active = currentStyle === styleName;
+                let label = "None";
+                if (styleName === "browser-light") label = "Light Window";
+                if (styleName === "browser-dark") label = "Dark Window";
+
+                return (
+                  <Button
+                    key={styleName}
+                    variant={active ? "default" : "outline"}
+                    size="xs"
+                    className="text-[10px] h-7.5 px-1 leading-none cursor-pointer"
+                    onClick={() =>
+                      dispatch({
+                        type: "update",
+                        payload: { frameStyle: styleName },
+                      })
+                    }
+                  >
+                    {label}
+                  </Button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderFineTuneControls = () => {
+    return (
+      <div className="flex flex-col gap-4">
+        {sliderSettings.map((setting) => {
+          const value = getScreenshotSetting(
+            state.present.screenshot,
+            setting.key
+          );
+
+          return (
+            <SliderDemo
+              key={setting.key}
+              label={setting.label}
+              value={[value]}
+              setValue={handleScreenshotSliderChange(
+                setting.key,
+                value
+              )}
+              min={setting.min}
+              max={setting.max}
+              step={setting.step}
+              unit={setting.unit}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderExportActionsControls = () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <span className="text-[10px] text-muted-foreground uppercase font-semibold">Actions</span>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleExport}
+              disabled={isExporting}
+              className="flex-1 text-xs h-9 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
+            >
+              {isExporting ? (
+                <IconLoader2 className="size-4 animate-spin mr-1" />
+              ) : (
+                <IconArrowDownToArc className="size-4 mr-1" />
+              )}
+              Export PNG
+            </Button>
+            
+            <Button
+              onClick={handleCopyToClipboard}
+              disabled={isCopying}
+              variant="outline"
+              className="h-9 px-3 text-xs"
+              title="Copy to clipboard"
+            >
+              {isCopying ? (
+                <IconLoader2 className="size-4 animate-spin" />
+              ) : (
+                <IconCopy className="size-4" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderBackground = () => {
     if (state.present.backgroundType === "color") {
       return (
@@ -852,625 +1743,14 @@ export default function Page() {
     <main className="flex h-svh w-svw flex-col overflow-hidden">
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <SidebarProvider style={{ minHeight: "100%", height: "100%" }} className="overflow-hidden">
-          <Sidebar className="w-72">
+          <Sidebar className="w-72 hidden lg:flex">
             <SidebarContent className="flex h-full flex-col p-2">
-              <Tabs value={activeTab} onValueChange={handleTabChange} className="flex h-full flex-col">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger
-                    value="background"
-                    className="data-active:border-none! data-active:bg-card! data-active:text-card-foreground!"
-                  >
-                    <IconStackForward />
-                    Background
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="colors"
-                    className="data-active:border-none! data-active:bg-card! data-active:text-card-foreground!"
-                  >
-                    <IconPaintFilled />
-                    Colors
-                  </TabsTrigger>
-                </TabsList>
-                <div className="min-h-0 flex-1 pt-2 flex flex-col">
-                  <TabsContent value="background" className="h-full flex flex-col min-h-0 flex-1">
-                    <ScrollArea className="flex-1 min-h-0">
-                      {categories.map((category) => {
-                        const Icon = category.icon;
-                        const categoryBackgrounds = backgrounds.filter(
-                          (bg) => bg.category === category.id
-                        );
-
-                        return (
-                          <div key={category.id} className="mb-4">
-                            <div className="flex items-center gap-1 text-sm opacity-80">
-                              <Icon className="size-4" />
-                              <span>{category.label}</span>
-                            </div>
-
-                            <div className="mt-1.5 flex w-full flex-wrap">
-                              {categoryBackgrounds.slice(0, 11).map((bg) => (
-                                <button
-                                  key={bg.backgroundUrl}
-                                  type="button"
-                                  className="p-1"
-                                  onClick={() =>
-                                    handleBackgroundImageSelection(
-                                      bg.backgroundUrl
-                                    )
-                                  }
-                                  aria-label={`Use ${bg.name}`}
-                                >
-                                  <img
-                                    src={bg.previewUrl}
-                                    alt=""
-                                    className={cn(
-                                      "size-9 rounded-md transition",
-                                      state.present.backgroundType === "image" &&
-                                        state.present.background ===
-                                          bg.backgroundUrl
-                                        ? "ring-2 ring-primary"
-                                        : "hover:ring-2 hover:ring-primary/50"
-                                    )}
-                                  />
-                                </button>
-                              ))}
-
-                              {categoryBackgrounds.length > 11 && (
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      className="m-1 size-9 rounded-md text-xs"
-                                    >
-                                      +{categoryBackgrounds.length - 11}
-                                    </Button>
-                                  </PopoverTrigger>
-
-                                  <PopoverContent
-                                    side="bottom"
-                                    align="start"
-                                    className="w-72 p-3"
-                                  >
-                                    <div className="mb-1 flex items-center justify-between">
-                                      <span className="text-sm font-medium">
-                                        {category.label}
-                                      </span>
-
-                                      <span className="text-xs text-muted-foreground">
-                                        {categoryBackgrounds.length}
-                                      </span>
-                                    </div>
-
-                                    <ScrollArea className="h-72">
-                                      <div className="flex flex-wrap gap-2 pr-2">
-                                        {categoryBackgrounds.map((bg) => (
-                                          <button
-                                            key={bg.backgroundUrl}
-                                            type="button"
-                                            onClick={() =>
-                                              handleBackgroundImageSelection(
-                                                bg.backgroundUrl
-                                              )
-                                            }
-                                            aria-label={`Use ${bg.name}`}
-                                          >
-                                            <img
-                                              src={bg.previewUrl}
-                                              alt=""
-                                              className={cn(
-                                                "size-9 rounded-md transition",
-                                                state.present.backgroundType ===
-                                                  "image" &&
-                                                  state.present.background ===
-                                                    bg.backgroundUrl
-                                                  ? "ring-2 ring-primary"
-                                                  : "hover:ring-2 hover:ring-primary/50"
-                                              )}
-                                            />
-                                          </button>
-                                        ))}
-                                      </div>
-                                    </ScrollArea>
-                                  </PopoverContent>
-                                </Popover>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </ScrollArea>
-                  </TabsContent>
-
-                  <TabsContent value="colors" className="h-full flex flex-col min-h-0 flex-1">
-                    <div className="flex flex-col h-full min-h-0 pr-1 flex-1">
-                      {/* Sub-tab selection */}
-                      <div className="flex border-b border-border/40 pb-2 mb-3 gap-1 shrink-0">
-                        {(["presets", "custom", "saved"] as const).map((tab) => {
-                          let label = "Presets";
-                          if (tab === "custom") label = "Custom";
-                          if (tab === "saved") label = "Saved";
-
-                          const active = colorSubTab === tab;
-                          return (
-                            <button
-                              key={tab}
-                              type="button"
-                              onClick={() => setColorSubTab(tab)}
-                              className={cn(
-                                "flex-1 pb-1.5 pt-1 text-center text-xs font-medium border-b-2 transition-all",
-                                active
-                                  ? "border-primary text-foreground"
-                                  : "border-transparent text-muted-foreground hover:text-foreground"
-                              )}
-                            >
-                              {label}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <ScrollArea className="flex-1 min-h-0">
-                        {colorSubTab === "presets" && (
-                          <div className="space-y-6 pr-2">
-                            {/* Solids Section */}
-                            <div>
-                              <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-                                <span>Solid Presets</span>
-                                <span className="text-[10px] text-muted-foreground/80 font-normal">{solidPresets.length}</span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                {solidPresets.map((color) => {
-                                  const isSelected =
-                                    state.present.backgroundType === "color" &&
-                                    state.present.background === color.value;
-
-                                  return (
-                                    <button
-                                      key={color.name}
-                                      type="button"
-                                      className={cn(
-                                        "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
-                                        isSelected
-                                          ? "border-primary ring-2 ring-primary/20"
-                                          : "border-border hover:border-primary/50"
-                                      )}
-                                      onClick={() => handleColorSelection(color.value)}
-                                    >
-                                      <span
-                                        className="mb-1.5 block h-10 rounded-md border border-black/5"
-                                        style={{ background: color.value }}
-                                      />
-                                      <span className="block truncate text-[11px] font-medium">
-                                        {color.name}
-                                      </span>
-                                      {isSelected && (
-                                        <span className="absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
-                                          <IconCheck className="size-3" />
-                                        </span>
-                                      )}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-
-                            {/* Gradients Section */}
-                            <div>
-                              <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-                                <span>Gradient Presets</span>
-                                <span className="text-[10px] text-muted-foreground/80 font-normal">{gradientPresets.length}</span>
-                              </div>
-                              <div className="grid grid-cols-2 gap-2">
-                                {gradientPresets.map((color) => {
-                                  const isSelected =
-                                    state.present.backgroundType === "color" &&
-                                    state.present.background === color.value;
-
-                                  return (
-                                    <button
-                                      key={color.name}
-                                      type="button"
-                                      className={cn(
-                                        "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
-                                        isSelected
-                                          ? "border-primary ring-2 ring-primary/20"
-                                          : "border-border hover:border-primary/50"
-                                      )}
-                                      onClick={() => handleColorSelection(color.value)}
-                                    >
-                                      <span
-                                        className="mb-1.5 block h-10 rounded-md border border-black/5"
-                                        style={{ background: color.value }}
-                                      />
-                                      <span className="block truncate text-[11px] font-medium">
-                                        {color.name}
-                                      </span>
-                                      {isSelected && (
-                                        <span className="absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
-                                          <IconCheck className="size-3" />
-                                        </span>
-                                      )}
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            </div>
-
-                            {/* Legacy Custom Color - as simple quick picker */}
-                            <div className="rounded-lg border bg-card p-3">
-                              <Label htmlFor="custom-color" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 block">
-                                Quick Custom Color
-                              </Label>
-                              <div className="flex items-center gap-2 mt-2">
-                                <div className="relative size-9 shrink-0 rounded-md overflow-hidden border border-border cursor-pointer">
-                                  <input
-                                    id="custom-color"
-                                    type="color"
-                                    value={customColor}
-                                    onChange={(event) => {
-                                      setCustomColor(event.target.value);
-                                      handleColorSelection(event.target.value);
-                                    }}
-                                    className="absolute inset-0 size-full cursor-pointer opacity-0"
-                                    aria-label="Choose custom background color"
-                                  />
-                                  <div className="size-full" style={{ backgroundColor: customColor }} />
-                                </div>
-                                <Input
-                                  value={customColor}
-                                  onChange={(event) => setCustomColor(event.target.value)}
-                                  onBlur={() => handleColorSelection(customColor)}
-                                  onKeyDown={(event) => {
-                                    if (event.key === "Enter") {
-                                      handleColorSelection(customColor);
-                                    }
-                                  }}
-                                  placeholder="#f8fafc"
-                                  className="font-mono text-xs h-9"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {colorSubTab === "custom" && (
-                          <div className="space-y-4 pr-2">
-                            {/* Preview box */}
-                            <div>
-                              <Label className="text-xs text-muted-foreground mb-1.5 block">Gradient Preview</Label>
-                              <div
-                                className="h-14 w-full rounded-lg border border-border shadow-inner"
-                                style={{
-                                  background: compileGradient(
-                                    gradientType,
-                                    gradientAngle,
-                                    radialShape,
-                                    radialPosition,
-                                    radialX,
-                                    radialY,
-                                    gradientStops
-                                  ),
-                                }}
-                              />
-                            </div>
-
-                            {/* Gradient Type */}
-                            <div>
-                              <Label className="text-xs text-muted-foreground mb-1.5 block">Gradient Type</Label>
-                              <div className="grid grid-cols-2 gap-2">
-                                {(["linear", "radial"] as const).map((type) => (
-                                  <Button
-                                    key={type}
-                                    type="button"
-                                    variant={gradientType === type ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setGradientType(type)}
-                                    className="text-xs h-8 capitalize"
-                                  >
-                                    {type}
-                                  </Button>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Linear Controls */}
-                            {gradientType === "linear" && (
-                              <div className="py-2 border-y border-border/30">
-                                <SliderDemo
-                                  label="Angle"
-                                  value={[gradientAngle]}
-                                  setValue={(val) => setGradientAngle(val[0] ?? 0)}
-                                  min={0}
-                                  max={360}
-                                  step={1}
-                                  unit="°"
-                                />
-                              </div>
-                            )}
-
-                            {/* Radial Controls */}
-                            {gradientType === "radial" && (
-                              <div className="space-y-4 py-2 border-y border-border/30">
-                                <div>
-                                  <Label className="text-[11px] text-muted-foreground mb-1.5 block">Radial Shape</Label>
-                                  <div className="grid grid-cols-2 gap-2">
-                                    {(["circle", "ellipse"] as const).map((shape) => (
-                                      <Button
-                                        key={shape}
-                                        type="button"
-                                        variant={radialShape === shape ? "default" : "outline"}
-                                        size="xs"
-                                        onClick={() => setRadialShape(shape)}
-                                        className="text-[11px] h-7 capitalize"
-                                      >
-                                        {shape}
-                                      </Button>
-                                    ))}
-                                  </div>
-                                </div>
-
-                                <div>
-                                  <Label className="text-[11px] text-muted-foreground mb-1.5 block">Position Preset</Label>
-                                  <div className="grid grid-cols-3 gap-1">
-                                    {[
-                                      { id: "top left", label: "Top L" },
-                                      { id: "top", label: "Top" },
-                                      { id: "top right", label: "Top R" },
-                                      { id: "left", label: "Left" },
-                                      { id: "center", label: "Center" },
-                                      { id: "right", label: "Right" },
-                                      { id: "bottom left", label: "Bottom L" },
-                                      { id: "bottom", label: "Bottom" },
-                                      { id: "bottom right", label: "Bottom R" },
-                                    ].map((pos) => (
-                                      <Button
-                                        key={pos.id}
-                                        type="button"
-                                        variant={radialPosition === pos.id ? "default" : "outline"}
-                                        size="xs"
-                                        onClick={() => setRadialPosition(pos.id)}
-                                        className="text-[10px] h-6 px-1"
-                                      >
-                                        {pos.label}
-                                      </Button>
-                                    ))}
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant={radialPosition === "custom" ? "default" : "outline"}
-                                    size="sm"
-                                    onClick={() => setRadialPosition("custom")}
-                                    className="text-[11px] w-full mt-2 h-7"
-                                  >
-                                    Custom Origin Offset
-                                  </Button>
-                                </div>
-
-                                {radialPosition === "custom" && (
-                                  <div className="space-y-4 p-2 rounded-lg border bg-zinc-950/20">
-                                    <SliderDemo
-                                      label="Origin X"
-                                      value={[radialX]}
-                                      setValue={(val) => setRadialX(val[0] ?? 50)}
-                                      min={0}
-                                      max={100}
-                                      step={1}
-                                      unit="%"
-                                    />
-                                    <SliderDemo
-                                      label="Origin Y"
-                                      value={[radialY]}
-                                      setValue={(val) => setRadialY(val[0] ?? 50)}
-                                      min={0}
-                                      max={100}
-                                      step={1}
-                                      unit="%"
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            )}
-
-                            {/* Color Stops Manager */}
-                            <div className="space-y-2.5">
-                              <Label className="text-xs text-muted-foreground block">Color Stops</Label>
-                              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                                {gradientStops.map((stop) => (
-                                  <div key={stop.id} className="flex items-center gap-2.5">
-                                    {/* Color Indicator */}
-                                    <div className="relative size-8 shrink-0 rounded-md overflow-hidden border border-border shadow-xs cursor-pointer">
-                                      <input
-                                        type="color"
-                                        value={stop.color}
-                                        onChange={(e) => {
-                                          const newStops = gradientStops.map((s) =>
-                                            s.id === stop.id ? { ...s, color: e.target.value } : s
-                                          );
-                                          setGradientStops(newStops);
-                                        }}
-                                        className="absolute inset-0 size-full cursor-pointer opacity-0"
-                                      />
-                                      <div className="size-full" style={{ backgroundColor: stop.color }} />
-                                    </div>
-
-                                    {/* Position range slider */}
-                                    <input
-                                      type="range"
-                                      min="0"
-                                      max="100"
-                                      value={stop.position}
-                                      onChange={(e) => {
-                                        const newStops = gradientStops.map((s) =>
-                                          s.id === stop.id ? { ...s, position: parseInt(e.target.value) } : s
-                                        );
-                                        setGradientStops(newStops);
-                                      }}
-                                      className="flex-1 min-w-0 accent-primary h-1 bg-muted rounded-lg appearance-none cursor-pointer"
-                                    />
-
-                                    {/* Precise percentage input */}
-                                    <Input
-                                      type="number"
-                                      min="0"
-                                      max="100"
-                                      value={stop.position}
-                                      onChange={(e) => {
-                                        const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
-                                        const newStops = gradientStops.map((s) =>
-                                          s.id === stop.id ? { ...s, position: val } : s
-                                        );
-                                        setGradientStops(newStops);
-                                      }}
-                                      className="w-14 text-center h-8 text-[11px] font-mono px-1! shrink-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                    />
-
-                                    {/* Delete Stop */}
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => {
-                                        if (gradientStops.length > 2) {
-                                          setGradientStops(gradientStops.filter((s) => s.id !== stop.id));
-                                        }
-                                      }}
-                                      disabled={gradientStops.length <= 2}
-                                      className="size-8 text-muted-foreground hover:text-destructive shrink-0"
-                                    >
-                                      <IconTrash className="size-4" />
-                                    </Button>
-                                  </div>
-                                ))}
-                              </div>
-
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                className="w-full text-xs flex items-center justify-center gap-1 h-8 mt-2"
-                                onClick={() => {
-                                  const id = Math.random().toString(36).substring(2, 9);
-                                  const sorted = [...gradientStops].sort((a, b) => a.position - b.position);
-                                  let newPos = 50;
-                                  if (sorted.length >= 2) {
-                                    let maxGap = -1;
-                                    let insertAfter = 0;
-                                    for (let i = 0; i < sorted.length - 1; i++) {
-                                      const gap = sorted[i + 1]!.position - sorted[i]!.position;
-                                      if (gap > maxGap) {
-                                        maxGap = gap;
-                                        insertAfter = i;
-                                      }
-                                    }
-                                    newPos = Math.round((sorted[insertAfter]!.position + sorted[insertAfter + 1]!.position) / 2);
-                                  }
-
-                                  setGradientStops([
-                                    ...gradientStops,
-                                    { id, color: "#ffffff", position: newPos },
-                                  ]);
-                                }}
-                              >
-                                <IconPlus className="size-3.5" />
-                                Add Color Stop
-                              </Button>
-                            </div>
-
-                            {/* Save to Presets */}
-                            <div className="pt-3 border-t border-border/30 mt-4 flex items-center justify-between gap-2">
-                              <Input
-                                placeholder="Preset Name"
-                                value={customPresetName}
-                                onChange={(e) => setCustomPresetName(e.target.value)}
-                                className="text-xs h-8 flex-1"
-                              />
-                              <Button
-                                type="button"
-                                onClick={saveToPresets}
-                                className="text-xs h-8 shrink-0 bg-primary/95 text-primary-foreground hover:bg-primary font-medium"
-                              >
-                                <IconHeart className="size-3.5 mr-1" />
-                                Save Preset
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-
-                        {colorSubTab === "saved" && (
-                          <div className="space-y-4 pr-2">
-                            {savedPresets.length === 0 ? (
-                              <div className="text-center py-10 px-4 border border-dashed rounded-lg bg-card/40">
-                                <IconPalette className="size-8 text-muted-foreground/60 mx-auto mb-2" />
-                                <p className="text-xs font-semibold text-muted-foreground">No saved presets yet</p>
-                                <p className="text-[10px] text-muted-foreground/75 mt-1.5 leading-normal">
-                                  Design a custom gradient on the "Custom" tab and click "Save Preset" to store it here.
-                                </p>
-                              </div>
-                            ) : (
-                              <div className="grid grid-cols-2 gap-2">
-                                {savedPresets.map((color, index) => {
-                                  const isSelected =
-                                    state.present.backgroundType === "color" &&
-                                    state.present.background === color.value;
-
-                                  return (
-                                    <div
-                                      key={index}
-                                      className={cn(
-                                        "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
-                                        isSelected
-                                          ? "border-primary ring-2 ring-primary/20"
-                                          : "border-border hover:border-primary/50"
-                                      )}
-                                    >
-                                      <button
-                                        type="button"
-                                        className="w-full text-left cursor-pointer"
-                                        onClick={() => handleColorSelection(color.value)}
-                                      >
-                                        <span
-                                          className="mb-1.5 block h-10 rounded-md border border-black/5"
-                                          style={{ background: color.value }}
-                                        />
-                                        <span className="block truncate text-[11px] font-medium pr-5">
-                                          {color.name}
-                                        </span>
-                                      </button>
-
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => {
-                                          const newPresets = savedPresets.filter((_, i) => i !== index);
-                                          setSavedPresets(newPresets);
-                                          localStorage.setItem("mockup_custom_presets", JSON.stringify(newPresets));
-                                        }}
-                                        className="absolute right-1 bottom-1 size-5 text-muted-foreground hover:text-destructive rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
-                                      >
-                                        <IconTrash className="size-3" />
-                                      </Button>
-
-                                      {isSelected && (
-                                        <span className="absolute right-3 top-3 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
-                                          <IconCheck className="size-3" />
-                                        </span>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </ScrollArea>
-                    </div>
-                  </TabsContent>
-                </div>
-              </Tabs>
+              {renderBackgroundAndColorsControls()}
             </SidebarContent>
           </Sidebar>
 
           <main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            <div className="flex h-14 w-full items-center justify-center shrink-0 border-b border-border/40 bg-background/50 backdrop-blur-md px-4 gap-4 select-none">
+            <div className="flex h-14 w-full items-center justify-between lg:justify-center shrink-0 border-b border-border/40 bg-background/50 backdrop-blur-md px-4 gap-2 lg:gap-4 select-none">
               {/* Undo/Redo */}
               <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/20">
                 <Tooltip>
@@ -1503,10 +1783,10 @@ export default function Page() {
                 </Tooltip>
               </div>
 
-              <div className="h-4 w-px bg-border/40" />
+              <div className="hidden lg:block h-4 w-px bg-border/40" />
 
-              {/* Canvas Aspect Ratio selector */}
-              <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/20 text-xs">
+              {/* Canvas Aspect Ratio selector - Hidden on Mobile, handled in Canvas Drawer */}
+              <div className="hidden lg:flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/20 text-xs">
                 {(["16-9", "1-1", "4-3", "9-16"] as const).map((ratio) => {
                   let label = "16:9";
                   if (ratio === "1-1") label = "1:1";
@@ -1532,18 +1812,18 @@ export default function Page() {
                 })}
               </div>
 
-              <div className="h-4 w-px bg-border/40" />
+              <div className="hidden lg:block h-4 w-px bg-border/40" />
 
               {/* View Resets & Action Buttons */}
               <div className="flex items-center gap-2">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="sm" onClick={handleResetView} className="h-9 px-3 gap-1.5 text-xs font-medium cursor-pointer">
+                    <Button variant="outline" size="sm" onClick={handleResetView} className="h-9 px-2 lg:px-3 gap-1.5 text-xs font-medium cursor-pointer">
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                         <path d="M3 3v5h5"/>
                       </svg>
-                      Reset view
+                      <span className="hidden lg:inline">Reset view</span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Reset 3D translations & zoom to defaults</TooltipContent>
@@ -1551,7 +1831,10 @@ export default function Page() {
 
                 <Popover onOpenChange={setStartOverOpen} open={startOverOpen}>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" size="sm" className="h-9 text-xs cursor-pointer">Start over</Button>
+                    <Button variant="outline" size="sm" className="h-9 px-2 lg:px-3 text-xs cursor-pointer">
+                      <span className="hidden lg:inline">Start over</span>
+                      <span className="inline lg:hidden">Reset</span>
+                    </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-64">
                     <div className="flex flex-col gap-3 p-2">
@@ -1735,9 +2018,135 @@ export default function Page() {
                 </div>
               </div>
             </div>
+
+            {/* Mobile Bottom Bar */}
+            <div className="lg:hidden flex h-16 w-full items-center justify-around border-t border-border/40 bg-background/80 backdrop-blur-md px-2 pb-safe select-none shrink-0 z-40">
+              <button
+                type="button"
+                onClick={() => setActiveMobileDrawer("canvas")}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors py-1 px-3 rounded-md cursor-pointer",
+                  activeMobileDrawer === "canvas" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <IconPalette className="size-5" />
+                <span>Canvas</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveMobileDrawer("layouts")}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors py-1 px-3 rounded-md cursor-pointer",
+                  activeMobileDrawer === "layouts" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <IconStackForward className="size-5" />
+                <span>Layouts</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveMobileDrawer("device")}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors py-1 px-3 rounded-md cursor-pointer",
+                  activeMobileDrawer === "device" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <IconDeviceLaptop className="size-5" />
+                <span>Device</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveMobileDrawer("adjust")}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors py-1 px-3 rounded-md cursor-pointer",
+                  activeMobileDrawer === "adjust" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <IconSettings className="size-5" />
+                <span>Adjust</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveMobileDrawer("export")}
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 text-[10px] font-medium transition-colors py-1 px-3 rounded-md cursor-pointer",
+                  activeMobileDrawer === "export" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <IconArrowDownToArc className="size-5" />
+                <span>Export</span>
+              </button>
+            </div>
+
+            {/* Mobile Drawer */}
+            <Drawer open={activeMobileDrawer !== null} onOpenChange={(open: boolean) => !open && setActiveMobileDrawer(null)}>
+              <DrawerContent className="p-4 pt-2">
+                <DrawerHeader className="px-1 py-3 text-left">
+                  <DrawerTitle className="text-sm font-semibold capitalize flex items-center justify-between">
+                    <span>
+                      {activeMobileDrawer === "canvas" && "Canvas Settings"}
+                      {activeMobileDrawer === "layouts" && "Mockup Layouts"}
+                      {activeMobileDrawer === "device" && "Device & Bezel Frame"}
+                      {activeMobileDrawer === "adjust" && "Fine Tune Mockup"}
+                      {activeMobileDrawer === "export" && "Export Actions"}
+                    </span>
+                    <DrawerClose asChild>
+                      <Button variant="ghost" size="icon" className="size-8 rounded-full cursor-pointer">
+                        <IconX className="size-4" />
+                      </Button>
+                    </DrawerClose>
+                  </DrawerTitle>
+                </DrawerHeader>
+                <div className="max-h-[50vh] overflow-y-auto pb-6 px-1">
+                  {activeMobileDrawer === "canvas" && (
+                    <div className="space-y-4">
+                      <div className="pb-3 border-b border-border/40">
+                        <span className="text-[10px] text-muted-foreground block mb-2 uppercase font-semibold">Canvas Aspect Ratio</span>
+                        <div className="flex items-center gap-1 bg-muted/40 p-1 rounded-lg border border-border/20 text-xs">
+                          {(["16-9", "1-1", "4-3", "9-16"] as const).map((ratio) => {
+                            let label = "16:9";
+                            if (ratio === "1-1") label = "1:1";
+                            if (ratio === "4-3") label = "4:3";
+                            if (ratio === "9-16") label = "9:16";
+
+                            const active = canvasRatio === ratio;
+                            return (
+                              <button
+                                key={ratio}
+                                type="button"
+                                onClick={() => setCanvasRatio(ratio)}
+                                className={cn(
+                                  "h-7 px-2.5 rounded-md font-medium transition cursor-pointer select-none text-[11px] flex-1 text-center",
+                                  active
+                                    ? "bg-background text-foreground shadow-xs border border-border/10"
+                                    : "text-muted-foreground hover:text-foreground"
+                                )}
+                              >
+                                {label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="h-[40vh] flex flex-col">
+                        {renderBackgroundAndColorsControls()}
+                      </div>
+                    </div>
+                  )}
+                  {activeMobileDrawer === "layouts" && renderLayoutsControls()}
+                  {activeMobileDrawer === "device" && renderDeviceFrameControls()}
+                  {activeMobileDrawer === "adjust" && renderFineTuneControls()}
+                  {activeMobileDrawer === "export" && renderExportActionsControls()}
+                </div>
+              </DrawerContent>
+            </Drawer>
           </main>
 
-          <Sidebar side="right" className="w-80 border-l border-border/50">
+          <Sidebar side="right" className="w-80 border-l border-border/50 hidden lg:flex">
             <SidebarContent className="flex h-full flex-col p-3 gap-3 overflow-hidden">
               {/* Header Action Bar */}
               <div className="flex flex-col gap-2 shrink-0 pb-2 border-b border-border/40">
@@ -1798,96 +2207,11 @@ export default function Page() {
                     
                     {sectionsExpanded.layouts && (
                       <div className="p-2 border-t border-border/40 bg-card/10">
-                        <div className="grid grid-cols-2 gap-2">
-                          {mockupPresets.map((preset) => {
-                            const active = isActivePreset(preset, state.present);
-                            
-                            return (
-                              <button
-                                key={preset.id}
-                                type="button"
-                                onClick={() => applyMockupPreset(preset)}
-                                className={cn(
-                                  "group relative rounded-lg border bg-card p-1.5 text-left transition select-none cursor-pointer",
-                                  active
-                                    ? "border-primary ring-1 ring-primary/20 bg-primary/5"
-                                    : "border-border/60 hover:border-primary/50"
-                                )}
-                              >
-                                <div className="relative mb-1.5 aspect-video overflow-hidden rounded-md bg-muted">
-                                  <div
-                                    className="absolute inset-0"
-                                    style={{
-                                      background:
-                                        state.present.backgroundType === "color"
-                                          ? state.present.background
-                                          : `url(${state.present.background}) center/cover no-repeat`,
-                                    }}
-                                  />
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <div
-                                      className="w-[72%] overflow-hidden border border-white/40 bg-background shadow-xl flex flex-col"
-                                      style={{
-                                        borderRadius: `${Math.max(
-                                          preset.settings.radius / 3,
-                                          4
-                                        )}px`,
-                                        padding: `${Math.min(
-                                          preset.settings.padding / 4,
-                                          8
-                                        )}px`,
-                                        transform: `
-                                          perspective(${preset.settings.perspective / 2}px)
-                                          translate(${preset.settings.x / 5}px, ${preset.settings.y / 5}px)
-                                          rotateX(${preset.settings.rotateX}deg)
-                                          rotateY(${preset.settings.rotateY}deg)
-                                          rotateZ(${preset.settings.rotateZ}deg)
-                                          scale(${preset.settings.zoom})
-                                        `,
-                                      }}
-                                    >
-                                      {preset.frameStyle && preset.frameStyle !== "none" && (
-                                        <div
-                                          className={cn(
-                                            "flex h-2 w-full items-center justify-between border-b px-0.5 select-none shrink-0",
-                                            preset.frameStyle === "browser-dark"
-                                              ? "bg-zinc-900 border-zinc-800 text-[2px]"
-                                              : "bg-zinc-100 border-zinc-200 text-[2px]"
-                                          )}
-                                        >
-                                          <div className="flex items-center gap-0.5 w-1/3">
-                                            <span className="size-0.5 rounded-full bg-red-400" />
-                                            <span className="size-0.5 rounded-full bg-yellow-400" />
-                                            <span className="size-0.5 rounded-full bg-green-400" />
-                                          </div>
-                                          <div className="h-0.5 w-5 rounded-xs bg-black/10" />
-                                          <div className="w-1/3" />
-                                        </div>
-                                      )}
-                                      <div className="aspect-video rounded-[inherit] bg-gradient-to-br from-foreground/60 via-foreground/20 to-background" />
-                                    </div>
-                                  </div>
-                                  {active && (
-                                    <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm">
-                                      <IconCheck className="size-2.5" />
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="min-w-0 px-0.5">
-                                  <div className="truncate text-[11px] font-medium leading-tight">
-                                    {preset.name}
-                                  </div>
-                                  <div className="truncate text-[9px] text-muted-foreground mt-0.5">
-                                    {preset.detail}
-                                  </div>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
+                        {renderLayoutsControls()}
                       </div>
                     )}
                   </div>
+
                   {/* Section 2: Frame Style */}
                   <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30">
                     <button
@@ -1904,107 +2228,8 @@ export default function Page() {
                     </button>
                     
                     {sectionsExpanded.frame && (
-                      <div className="p-3 border-t border-border/40 bg-card/10 flex flex-col gap-3">
-                        {/* Device Type Select */}
-                        <div>
-                          <span className="text-[10px] text-muted-foreground block mb-1">Device Mockup Type</span>
-                          <div className="grid grid-cols-2 gap-1.5">
-                            {(["desktop", "mobile"] as const).map((device) => {
-                              const active = (state.present.deviceType ?? "desktop") === device;
-                              return (
-                                <Button
-                                  key={device}
-                                  variant={active ? "default" : "outline"}
-                                  size="xs"
-                                  className="text-[10px] h-7 capitalize cursor-pointer"
-                                  onClick={() => {
-                                    // Map frame style automatically when switching device
-                                    let nextFrameStyle: EditorState["frameStyle"] = "none";
-                                    const currentStyle = state.present.frameStyle ?? "none";
-                                    if (device === "mobile") {
-                                      if (currentStyle === "browser-light") nextFrameStyle = "phone-light";
-                                      if (currentStyle === "browser-dark") nextFrameStyle = "phone-dark";
-                                      if (currentStyle === "none") nextFrameStyle = "none";
-                                    } else {
-                                      if (currentStyle === "phone-light") nextFrameStyle = "browser-light";
-                                      if (currentStyle === "phone-dark") nextFrameStyle = "browser-dark";
-                                      if (currentStyle === "none") nextFrameStyle = "none";
-                                    }
-                                    dispatch({
-                                      type: "update",
-                                      payload: {
-                                        deviceType: device,
-                                        frameStyle: nextFrameStyle,
-                                      },
-                                    });
-                                  }}
-                                >
-                                  {device === "desktop" ? "Desktop Browser" : "Mobile Phone"}
-                                </Button>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        {/* Bezel Style Select */}
-                        <div>
-                          <span className="text-[10px] text-muted-foreground block mb-1">Frame Bezel Style</span>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {state.present.deviceType === "mobile" ? (
-                              // Mobile options
-                              (["none", "phone-light", "phone-dark"] as const).map((styleName) => {
-                                const currentStyle = state.present.frameStyle ?? "none";
-                                const active = currentStyle === styleName;
-                                let label = "None";
-                                if (styleName === "phone-light") label = "Light Phone";
-                                if (styleName === "phone-dark") label = "Dark Phone";
-
-                                return (
-                                  <Button
-                                    key={styleName}
-                                    variant={active ? "default" : "outline"}
-                                    size="xs"
-                                    className="text-[10px] h-7.5 px-1 leading-none cursor-pointer"
-                                    onClick={() =>
-                                      dispatch({
-                                        type: "update",
-                                        payload: { frameStyle: styleName },
-                                      })
-                                    }
-                                  >
-                                    {label}
-                                  </Button>
-                                );
-                              })
-                            ) : (
-                              // Desktop options
-                              (["none", "browser-light", "browser-dark"] as const).map((styleName) => {
-                                const currentStyle = state.present.frameStyle ?? "none";
-                                const active = currentStyle === styleName;
-                                let label = "None";
-                                if (styleName === "browser-light") label = "Light Window";
-                                if (styleName === "browser-dark") label = "Dark Window";
-
-                                return (
-                                  <Button
-                                    key={styleName}
-                                    variant={active ? "default" : "outline"}
-                                    size="xs"
-                                    className="text-[10px] h-7.5 px-1 leading-none cursor-pointer"
-                                    onClick={() =>
-                                      dispatch({
-                                        type: "update",
-                                        payload: { frameStyle: styleName },
-                                      })
-                                    }
-                                  >
-                                    {label}
-                                  </Button>
-                                );
-                              })
-                            )}
-                          </div>
-                        </div>
+                      <div className="p-3 border-t border-border/40 bg-card/10">
+                        {renderDeviceFrameControls()}
                       </div>
                     )}
                   </div>
@@ -2025,29 +2250,8 @@ export default function Page() {
                     </button>
                     
                     {sectionsExpanded.fineTune && (
-                      <div className="p-3 border-t border-border/40 bg-card/10 flex flex-col gap-4">
-                        {sliderSettings.map((setting) => {
-                          const value = getScreenshotSetting(
-                            state.present.screenshot,
-                            setting.key
-                          );
-
-                          return (
-                            <SliderDemo
-                              key={setting.key}
-                              label={setting.label}
-                              value={[value]}
-                              setValue={handleScreenshotSliderChange(
-                                setting.key,
-                                value
-                              )}
-                              min={setting.min}
-                              max={setting.max}
-                              step={setting.step}
-                              unit={setting.unit}
-                            />
-                          );
-                        })}
+                      <div className="p-3 border-t border-border/40 bg-card/10">
+                        {renderFineTuneControls()}
                       </div>
                     )}
                   </div>
@@ -2075,7 +2279,8 @@ export default function Page() {
               ) : (
                 <IconArrowDownToArc className="size-4" />
               )}
-              Export PNG
+              <span className="hidden sm:inline">Export PNG</span>
+              <span className="sm:hidden">Export</span>
             </Button>
             
             <Button
@@ -2090,7 +2295,8 @@ export default function Page() {
               ) : (
                 <IconCopy className="size-4" />
               )}
-              Copy Image
+              <span className="hidden sm:inline">Copy Image</span>
+              <span className="sm:hidden">Copy</span>
             </Button>
 
             <Button
