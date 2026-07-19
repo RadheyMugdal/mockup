@@ -21,10 +21,10 @@ import {
 
 import { Button } from "@workspace/ui/components/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
-import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Sidebar, SidebarContent, SidebarProvider } from "@workspace/ui/components/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@workspace/ui/components/drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 
 // Split Imports
 import { appleFrames, initialState } from "@/lib/constants";
@@ -319,11 +319,11 @@ export default function Page() {
     <main className="flex h-svh w-svw flex-col overflow-hidden">
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <SidebarProvider style={{ minHeight: "100%", height: "100%" }} className="overflow-hidden">
-          <Sidebar className="w-80 border-r border-border/50 hidden lg:flex" style={{ "--sidebar-width": "20rem" } as React.CSSProperties}>
+          <Sidebar className="w-72 border-r border-border/50 hidden lg:flex" style={{ "--sidebar-width": "18rem" } as React.CSSProperties}>
             <SidebarContent className="flex h-full flex-col p-3 gap-3 overflow-hidden">
-              <ScrollArea className="flex-1 min-h-0 pr-1">
+              <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
                 <BackgroundAndColorsControls state={state.present} dispatch={dispatch} />
-              </ScrollArea>
+              </div>
               <div className="shrink-0 pt-2.5 border-t border-border/40">
                 <DeviceControls state={state.present} dispatch={dispatch} />
               </div>
@@ -406,8 +406,8 @@ export default function Page() {
                       className="h-9 px-2 lg:px-3 gap-1.5 text-xs font-medium cursor-pointer"
                     >
                       <svg xmlns="http://www.w3.org/2050/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                        <path d="M3 3v5h5"/>
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
                       </svg>
                       <span className="hidden lg:inline">Reset view</span>
                     </Button>
@@ -467,12 +467,12 @@ export default function Page() {
                   "relative m-4 mx-auto overflow-hidden rounded-xl bg-zinc-900 shadow-2xl transition-all duration-300 max-w-full max-h-[calc(100svh-14rem)] flex items-center justify-center",
                   canvasRatio === "16-9" && "w-[min(90%,56rem,calc((100svh-14rem)*1.7777))]",
                   canvasRatio === "1-1" && "w-[min(90%,34rem,calc(100svh-14rem))]",
-                  canvasRatio === "9-16" && "w-[min(90%,21rem,calc((100svh-14rem)*0.5625))]",
+              canvasRatio === "9-16" && "w-[min(90%,21rem,calc((100svh-14rem)*0.5625))]",
                   canvasRatio === "4-3" && "w-[min(90%,46rem,calc((100svh-14rem)*1.3333))]"
                 )}
               >
                 {renderBackground()}
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center [backface-visibility:hidden] [transform-style:preserve-3d]" style={{ perspective: `${screenshotPerspective}px` }}>
                   {state.present.frameStyle === "custom-device" && state.present.selectedFrame ? (
                     (() => {
                       const frame = appleFrames.find((f) => f.id === state.present.selectedFrame?.id);
@@ -485,35 +485,38 @@ export default function Page() {
                               ? canvasRatio === "16-9"
                                 ? "w-[80%] max-w-4xl"
                                 : canvasRatio === "4-3"
-                                ? "w-[82%] max-w-3xl"
-                                : canvasRatio === "1-1"
-                                ? "w-[85%] max-w-2xl"
-                                : "w-[90%] max-w-md"
+                                  ? "w-[82%] max-w-3xl"
+                                  : canvasRatio === "1-1"
+                                    ? "w-[85%] max-w-2xl"
+                                    : "w-[90%] max-w-md"
                               : category === "tablet"
-                              ? canvasRatio === "16-9"
-                                ? "w-[40%] max-w-[380px]"
-                                : canvasRatio === "4-3"
-                                ? "w-[48%] max-w-[420px]"
-                                : canvasRatio === "1-1"
-                                ? "w-[58%] max-w-[460px]"
-                                : "w-[75%] max-w-[360px]"
-                              : canvasRatio === "16-9"
-                              ? "w-[24%] max-w-[220px]"
-                              : canvasRatio === "4-3"
-                              ? "w-[30%] max-w-[240px]"
-                              : canvasRatio === "1-1"
-                              ? "w-[48%] max-w-[260px]"
-                              : "w-[75%] max-w-[280px]"
+                                ? canvasRatio === "16-9"
+                                  ? "w-[40%] max-w-[380px]"
+                                  : canvasRatio === "4-3"
+                                    ? "w-[48%] max-w-[420px]"
+                                    : canvasRatio === "1-1"
+                                      ? "w-[58%] max-w-[460px]"
+                                      : "w-[75%] max-w-[360px]"
+                                : canvasRatio === "16-9"
+                                  ? "w-[24%] max-w-[220px]"
+                                  : canvasRatio === "4-3"
+                                    ? "w-[30%] max-w-[240px]"
+                                    : canvasRatio === "1-1"
+                                      ? "w-[48%] max-w-[260px]"
+                                      : "w-[75%] max-w-[280px]"
                           )}
                           style={{
                             transform: `
-                              perspective(${screenshotPerspective}px)
                               translate(${screenshotX}px, ${screenshotY}px)
                               rotateX(${screenshotRotateX}deg)
                               rotateY(${screenshotRotateY}deg)
                               rotateZ(${screenshotRotateZ}deg)
                               scale(${screenshotZoom})
                             `,
+                            backfaceVisibility: "hidden",
+                            transformStyle: "preserve-3d",
+                            willChange: "transform",
+                            outline: "1px solid transparent",
                           }}
                         >
                           {renderCustomAppleFrame(state.present.selectedFrame.id, state.present.selectedFrame.color)}
@@ -532,13 +535,16 @@ export default function Page() {
                       )}
                       style={{
                         transform: `
-                          perspective(${screenshotPerspective}px)
                           translate(${screenshotX}px, ${screenshotY}px)
                           rotateX(${screenshotRotateX}deg)
                           rotateY(${screenshotRotateY}deg)
                           rotateZ(${screenshotRotateZ}deg)
                           scale(${screenshotZoom})
                         `,
+                        backfaceVisibility: "hidden",
+                        transformStyle: "preserve-3d",
+                        willChange: "transform",
+                        outline: "1px solid transparent",
                       }}
                     >
                       {/* Phone Frame Wrapper */}
@@ -548,8 +554,8 @@ export default function Page() {
                           state.present.frameStyle === "phone-light"
                             ? "bg-zinc-200 shadow-zinc-400/20"
                             : state.present.frameStyle === "phone-dark"
-                            ? "bg-zinc-800 shadow-black/40"
-                            : "bg-transparent p-0"
+                              ? "bg-zinc-800 shadow-black/40"
+                              : "bg-transparent p-0"
                         )}
                       >
                         {/* Inner Bezel */}
@@ -609,13 +615,16 @@ export default function Page() {
                         borderRadius: `${screenshotRadius}px`,
                         padding: `${screenshotPadding}px`,
                         transform: `
-                          perspective(${screenshotPerspective}px)
                           translate(${screenshotX}px, ${screenshotY}px)
                           rotateX(${screenshotRotateX}deg)
                           rotateY(${screenshotRotateY}deg)
                           rotateZ(${screenshotRotateZ}deg)
                           scale(${screenshotZoom})
                         `,
+                        backfaceVisibility: "hidden",
+                        transformStyle: "preserve-3d",
+                        willChange: "transform",
+                        outline: "1px solid transparent",
                       }}
                     >
                       {state.present.frameStyle &&
@@ -797,8 +806,8 @@ export default function Page() {
 
           <Sidebar
             side="right"
-            className="w-80 border-l border-border/50 hidden lg:flex"
-            style={{ "--sidebar-width": "20rem" } as React.CSSProperties}
+            className="w-72 border-l border-border/50 hidden lg:flex"
+            style={{ "--sidebar-width": "18rem" } as React.CSSProperties}
           >
             <SidebarContent className="flex h-full flex-col p-3 gap-3 overflow-hidden">
               {/* Header Action Bar */}
@@ -811,57 +820,26 @@ export default function Page() {
                 />
               </div>
 
-              {/* Scrollable controls */}
-              <ScrollArea className="flex-1 min-h-0 pr-1">
-                <div className="space-y-4 pb-4">
-                  {/* Section 1: Mockup Layouts */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30">
-                    <button
-                      type="button"
-                      onClick={() => toggleSection("layouts")}
-                      className="flex items-center justify-between w-full p-2.5 text-left font-medium text-xs text-foreground bg-card hover:bg-muted/30 transition-colors cursor-pointer"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span>Mockup Layouts</span>
-                      </div>
-                      {sectionsExpanded.layouts ? (
-                        <IconChevronDown className="size-3.5 text-muted-foreground" />
-                      ) : (
-                        <IconChevronRight className="size-3.5 text-muted-foreground" />
-                      )}
-                    </button>
+              {/* Tabs for Layouts presets and Adjust controls */}
+              <Tabs defaultValue="layouts" className="flex-1 flex flex-col min-h-0">
+                <TabsList className="grid w-full grid-cols-2 shrink-0">
+                  <TabsTrigger value="layouts">
+                    Layouts
+                  </TabsTrigger>
+                  <TabsTrigger value="adjust">
+                    Adjust
+                  </TabsTrigger>
+                </TabsList>
 
-                    {sectionsExpanded.layouts && (
-                      <div className="p-2 border-t border-border/40 bg-card/10">
-                        <LayoutControls state={state.present} dispatch={dispatch} />
-                      </div>
-                    )}
-                  </div>
-
-
-                  {/* Section 3: Fine Tune Settings */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30">
-                    <button
-                      type="button"
-                      onClick={() => toggleSection("fineTune")}
-                      className="flex items-center justify-between w-full p-2.5 text-left font-medium text-xs text-foreground bg-card hover:bg-muted/30 transition-colors cursor-pointer"
-                    >
-                      <span>Fine Tune Mockup</span>
-                      {sectionsExpanded.fineTune ? (
-                        <IconChevronDown className="size-3.5 text-muted-foreground" />
-                      ) : (
-                        <IconChevronRight className="size-3.5 text-muted-foreground" />
-                      )}
-                    </button>
-
-                    {sectionsExpanded.fineTune && (
-                      <div className="p-3 border-t border-border/40 bg-card/10">
-                        <FineTuneControls state={state.present} updateScreenshot={updateScreenshot} />
-                      </div>
-                    )}
-                  </div>
+                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pt-2">
+                  <TabsContent value="layouts" className="m-0 outline-none">
+                    <LayoutControls state={state.present} dispatch={dispatch} />
+                  </TabsContent>
+                  <TabsContent value="adjust" className="m-0 outline-none">
+                    <FineTuneControls state={state.present} updateScreenshot={updateScreenshot} />
+                  </TabsContent>
                 </div>
-              </ScrollArea>
+              </Tabs>
             </SidebarContent>
           </Sidebar>
         </SidebarProvider>
@@ -926,7 +904,7 @@ export default function Page() {
             )}
           >
             {renderBackground()}
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: `${screenshotPerspective}px` }}>
               {state.present.frameStyle === "custom-device" && state.present.selectedFrame ? (
                 (() => {
                   const frame = appleFrames.find((f) => f.id === state.present.selectedFrame?.id);
@@ -939,35 +917,38 @@ export default function Page() {
                           ? canvasRatio === "16-9"
                             ? "w-[80%] max-w-4xl"
                             : canvasRatio === "4-3"
-                            ? "w-[82%] max-w-3xl"
-                            : canvasRatio === "1-1"
-                            ? "w-[85%] max-w-2xl"
-                            : "w-[90%] max-w-md"
+                              ? "w-[82%] max-w-3xl"
+                              : canvasRatio === "1-1"
+                                ? "w-[85%] max-w-2xl"
+                                : "w-[90%] max-w-md"
                           : category === "tablet"
-                          ? canvasRatio === "16-9"
-                            ? "w-[40%] max-w-[380px]"
-                            : canvasRatio === "4-3"
-                            ? "w-[48%] max-w-[420px]"
-                            : canvasRatio === "1-1"
-                            ? "w-[58%] max-w-[460px]"
-                            : "w-[75%] max-w-[360px]"
-                          : canvasRatio === "16-9"
-                          ? "w-[24%] max-w-[220px]"
-                          : canvasRatio === "4-3"
-                          ? "w-[30%] max-w-[240px]"
-                          : canvasRatio === "1-1"
-                          ? "w-[48%] max-w-[260px]"
-                          : "w-[75%] max-w-[280px]"
+                            ? canvasRatio === "16-9"
+                              ? "w-[40%] max-w-[380px]"
+                              : canvasRatio === "4-3"
+                                ? "w-[48%] max-w-[420px]"
+                                : canvasRatio === "1-1"
+                                  ? "w-[58%] max-w-[460px]"
+                                  : "w-[75%] max-w-[360px]"
+                            : canvasRatio === "16-9"
+                              ? "w-[24%] max-w-[220px]"
+                              : canvasRatio === "4-3"
+                                ? "w-[30%] max-w-[240px]"
+                                : canvasRatio === "1-1"
+                                  ? "w-[48%] max-w-[260px]"
+                                  : "w-[75%] max-w-[280px]"
                       )}
                       style={{
                         transform: `
-                          perspective(${screenshotPerspective}px)
                           translate(${screenshotX}px, ${screenshotY}px)
                           rotateX(${screenshotRotateX}deg)
                           rotateY(${screenshotRotateY}deg)
                           rotateZ(${screenshotRotateZ}deg)
                           scale(${screenshotZoom})
                         `,
+                        backfaceVisibility: "hidden",
+                        transformStyle: "preserve-3d",
+                        willChange: "transform",
+                        outline: "1px solid transparent",
                       }}
                     >
                       {renderCustomAppleFrame(state.present.selectedFrame.id, state.present.selectedFrame.color)}
@@ -985,13 +966,16 @@ export default function Page() {
                     borderColor: state.present.frameStyle === "phone-light" ? "#f4f4f5" : "#18181b",
                     backgroundColor: state.present.frameStyle === "phone-light" ? "#f4f4f5" : "#18181b",
                     transform: `
-                      perspective(${screenshotPerspective}px)
                       translate(${screenshotX}px, ${screenshotY}px)
                       rotateX(${screenshotRotateX}deg)
                       rotateY(${screenshotRotateY}deg)
                       rotateZ(${screenshotRotateZ}deg)
                       scale(${screenshotZoom})
                     `,
+                    backfaceVisibility: "hidden",
+                    transformStyle: "preserve-3d",
+                    willChange: "transform",
+                    outline: "1px solid transparent",
                   }}
                 >
                   {/* Dynamic Island */}
@@ -1021,13 +1005,16 @@ export default function Page() {
                     borderRadius: `${screenshotRadius}px`,
                     padding: `${screenshotPadding}px`,
                     transform: `
-                      perspective(${screenshotPerspective}px)
                       translate(${screenshotX}px, ${screenshotY}px)
                       rotateX(${screenshotRotateX}deg)
                       rotateY(${screenshotRotateY}deg)
                       rotateZ(${screenshotRotateZ}deg)
                       scale(${screenshotZoom})
                     `,
+                    backfaceVisibility: "hidden",
+                    transformStyle: "preserve-3d",
+                    willChange: "transform",
+                    outline: "1px solid transparent",
                   }}
                 >
                   {state.present.frameStyle &&

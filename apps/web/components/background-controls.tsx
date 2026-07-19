@@ -241,12 +241,18 @@ export function BackgroundAndColorsControls({
                     <span>{category.label}</span>
                   </div>
 
-                  <div className="mt-1.5 flex w-full flex-wrap">
-                    {categoryBackgrounds.slice(0, 11).map((bg) => (
+                  <div className="mt-1.5 grid grid-cols-6 gap-2 w-full">
+                    {categoryBackgrounds.slice(0, 17).map((bg) => (
                       <button
                         key={bg.backgroundUrl}
                         type="button"
-                        className="p-1"
+                        className={cn(
+                          "relative aspect-square rounded-md overflow-hidden transition w-full border border-black/5 cursor-pointer",
+                          state.backgroundType === "image" &&
+                            state.background === bg.backgroundUrl
+                            ? "ring-2 ring-primary"
+                            : "hover:ring-2 hover:ring-primary/50"
+                        )}
                         onClick={() =>
                           handleBackgroundImageSelection(bg.backgroundUrl)
                         }
@@ -255,25 +261,19 @@ export function BackgroundAndColorsControls({
                         <img
                           src={bg.previewUrl}
                           alt=""
-                          className={cn(
-                            "size-9 rounded-md transition",
-                            state.backgroundType === "image" &&
-                              state.background === bg.backgroundUrl
-                              ? "ring-2 ring-primary"
-                              : "hover:ring-2 hover:ring-primary/50"
-                          )}
+                          className="absolute inset-0 size-full object-cover"
                         />
                       </button>
                     ))}
 
-                    {categoryBackgrounds.length > 11 && (
+                    {categoryBackgrounds.length > 17 && (
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className="m-1 size-9 rounded-md text-xs"
+                            className="aspect-square w-full rounded-md text-xs p-0 h-auto cursor-pointer"
                           >
-                            +{categoryBackgrounds.length - 11}
+                            +{categoryBackgrounds.length - 17}
                           </Button>
                         </PopoverTrigger>
 
@@ -329,7 +329,7 @@ export function BackgroundAndColorsControls({
         </TabsContent>
 
         <TabsContent value="colors" className="h-full flex flex-col min-h-0 flex-1">
-          <div className="flex flex-col h-full min-h-0 pr-1 flex-1">
+          <div className="flex flex-col h-full min-h-0 flex-1">
             {/* Sub-tab selection */}
             <div className="flex border-b border-border/40 pb-2 mb-3 gap-1 shrink-0">
               {(["presets", "custom", "saved"] as const).map((tab) => {
@@ -356,7 +356,7 @@ export function BackgroundAndColorsControls({
               })}
             </div>
 
-            <div className="flex-1 min-h-0 space-y-4 pr-1">
+            <div className="flex-1 min-h-0 space-y-4">
               {colorSubTab === "presets" && (
                 <div className="space-y-6 px-0.5">
                   {/* Solids Section */}
@@ -376,7 +376,7 @@ export function BackgroundAndColorsControls({
                             key={color.name}
                             type="button"
                             className={cn(
-                              "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
+                              "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition w-full",
                               isSelected
                                 ? "border-primary ring-2 ring-primary/20"
                                 : "border-border hover:border-primary/50"
@@ -418,7 +418,7 @@ export function BackgroundAndColorsControls({
                             key={color.name}
                             type="button"
                             className={cn(
-                              "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition",
+                              "group relative overflow-hidden rounded-lg border bg-card p-2 text-left transition w-full",
                               isSelected
                                 ? "border-primary ring-2 ring-primary/20"
                                 : "border-border hover:border-primary/50"
@@ -473,7 +473,7 @@ export function BackgroundAndColorsControls({
                           }
                         }}
                         placeholder="#f8fafc"
-                        className="font-mono text-xs h-9"
+                        className="font-mono text-xs h-9 w-full flex-1 min-w-0"
                       />
                     </div>
                   </div>
@@ -512,7 +512,7 @@ export function BackgroundAndColorsControls({
                           variant={gradientType === type ? "default" : "outline"}
                           size="sm"
                           onClick={() => setGradientType(type)}
-                          className="text-xs h-8 capitalize"
+                          className="text-xs h-8 capitalize w-full"
                         >
                           {type}
                         </Button>
@@ -548,7 +548,7 @@ export function BackgroundAndColorsControls({
                               variant={radialShape === shape ? "default" : "outline"}
                               size="xs"
                               onClick={() => setRadialShape(shape)}
-                              className="text-[11px] h-7 capitalize"
+                              className="text-[11px] h-7 capitalize w-full"
                             >
                               {shape}
                             </Button>
@@ -576,7 +576,7 @@ export function BackgroundAndColorsControls({
                               variant={radialPosition === pos.id ? "default" : "outline"}
                               size="xs"
                               onClick={() => setRadialPosition(pos.id)}
-                              className="text-[10px] h-6 px-1"
+                              className="text-[10px] h-6 px-1 w-full"
                             >
                               {pos.label}
                             </Button>
@@ -621,70 +621,82 @@ export function BackgroundAndColorsControls({
                   {/* Color Stops Manager */}
                   <div className="space-y-2.5">
                     <Label className="text-xs text-muted-foreground block">Color Stops</Label>
-                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
                       {gradientStops.map((stop) => (
-                        <div key={stop.id} className="flex items-center gap-2.5">
-                          {/* Color Indicator */}
-                          <div className="relative size-8 shrink-0 rounded-md overflow-hidden border border-border shadow-xs cursor-pointer">
-                            <input
-                              type="color"
-                              value={stop.color}
-                              onChange={(e) => {
-                                const newStops = gradientStops.map((s) =>
-                                  s.id === stop.id ? { ...s, color: e.target.value } : s
-                                );
-                                setGradientStops(newStops);
-                              }}
-                              className="absolute inset-0 size-full cursor-pointer opacity-0"
-                            />
-                            <div className="size-full" style={{ backgroundColor: stop.color }} />
+                        <div key={stop.id} className="flex flex-col gap-1.5 p-2 rounded-xl border border-border/40 bg-card/35">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {/* Color Indicator */}
+                              <div className="relative size-7 shrink-0 rounded-md overflow-hidden border border-border shadow-xs cursor-pointer">
+                                <input
+                                  type="color"
+                                  value={stop.color}
+                                  onChange={(e) => {
+                                    const newStops = gradientStops.map((s) =>
+                                      s.id === stop.id ? { ...s, color: e.target.value } : s
+                                    );
+                                    setGradientStops(newStops);
+                                  }}
+                                  className="absolute inset-0 size-full cursor-pointer opacity-0"
+                                />
+                                <div className="size-full" style={{ backgroundColor: stop.color }} />
+                              </div>
+                              <span className="text-[10px] font-mono font-semibold text-muted-foreground/80">{stop.color}</span>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              {/* Precise percentage input */}
+                              <div className="flex items-center gap-1">
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="100"
+                                  value={stop.position}
+                                  onChange={(e) => {
+                                    const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                                    const newStops = gradientStops.map((s) =>
+                                      s.id === stop.id ? { ...s, position: val } : s
+                                    );
+                                    setGradientStops(newStops);
+                                  }}
+                                  className="w-12 text-center h-7 text-[10px] font-mono px-1! [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                />
+                                <span className="text-[10px] text-muted-foreground">%</span>
+                              </div>
+
+                              {/* Delete Stop */}
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  if (gradientStops.length > 2) {
+                                    setGradientStops(gradientStops.filter((s) => s.id !== stop.id));
+                                  }
+                                }}
+                                disabled={gradientStops.length <= 2}
+                                className="size-7 text-muted-foreground hover:text-destructive"
+                              >
+                                <IconTrash className="size-3.5" />
+                              </Button>
+                            </div>
                           </div>
 
                           {/* Position range slider */}
-                          <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={stop.position}
-                            onChange={(e) => {
-                              const newStops = gradientStops.map((s) =>
-                                s.id === stop.id ? { ...s, position: parseInt(e.target.value) } : s
-                              );
-                              setGradientStops(newStops);
-                            }}
-                            className="flex-1 min-w-0 accent-primary h-1 bg-muted rounded-lg appearance-none cursor-pointer"
-                          />
-
-                          {/* Precise percentage input */}
-                          <Input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={stop.position}
-                            onChange={(e) => {
-                              const val = Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
-                              const newStops = gradientStops.map((s) =>
-                                s.id === stop.id ? { ...s, position: val } : s
-                              );
-                              setGradientStops(newStops);
-                            }}
-                            className="w-14 text-center h-8 text-[11px] font-mono px-1! shrink-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
-
-                          {/* Delete Stop */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              if (gradientStops.length > 2) {
-                                setGradientStops(gradientStops.filter((s) => s.id !== stop.id));
-                              }
-                            }}
-                            disabled={gradientStops.length <= 2}
-                            className="size-8 text-muted-foreground hover:text-destructive shrink-0"
-                          >
-                            <IconTrash className="size-4" />
-                          </Button>
+                          <div className="flex items-center px-1">
+                            <input
+                              type="range"
+                              min="0"
+                              max="100"
+                              value={stop.position}
+                              onChange={(e) => {
+                                const newStops = gradientStops.map((s) =>
+                                  s.id === stop.id ? { ...s, position: parseInt(e.target.value) } : s
+                                );
+                                setGradientStops(newStops);
+                              }}
+                              className="w-full accent-primary h-1 bg-muted rounded-lg appearance-none cursor-pointer"
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -723,17 +735,17 @@ export function BackgroundAndColorsControls({
                   </div>
 
                   {/* Save to Presets */}
-                  <div className="pt-3 border-t border-border/30 mt-4 flex items-center justify-between gap-2">
+                  <div className="pt-3 border-t border-border/30 mt-4 flex flex-col gap-2">
                     <Input
                       placeholder="Preset Name"
                       value={customPresetName}
                       onChange={(e) => setCustomPresetName(e.target.value)}
-                      className="text-xs h-8 flex-1"
+                      className="text-xs h-8 w-full"
                     />
                     <Button
                       type="button"
                       onClick={saveToPresets}
-                      className="text-xs h-8 shrink-0 bg-primary/95 text-primary-foreground hover:bg-primary font-medium"
+                      className="text-xs h-8 w-full bg-primary/95 text-primary-foreground hover:bg-primary font-medium"
                     >
                       <IconHeart className="size-3.5 mr-1" />
                       Save Preset
