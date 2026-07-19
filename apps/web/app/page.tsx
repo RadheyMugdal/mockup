@@ -34,7 +34,6 @@ import { cn } from "@/lib/utils";
 
 // Custom Subcomponents
 import { BrowserHeader } from "@/components/browser-header";
-import { DeviceCatalog } from "@/components/device-catalog";
 import { BackgroundAndColorsControls } from "@/components/background-controls";
 import { LayoutControls } from "@/components/layout-controls";
 import { DeviceControls } from "@/components/device-controls";
@@ -55,7 +54,6 @@ export default function Page() {
   const [isExporting, setIsExporting] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const [activeMobileDrawer, setActiveMobileDrawer] = useState<"canvas" | "layouts" | "device" | "adjust" | "export" | null>(null);
-  const [isDeviceCatalogOpen, setIsDeviceCatalogOpen] = useState(false);
 
   const [sectionsExpanded, setSectionsExpanded] = useState({
     layouts: true,
@@ -253,6 +251,15 @@ export default function Page() {
     const imageUrl = frame.assetPattern.replace("${color}", color);
     const insets = frame.insets;
 
+    // Explicit image file aspect ratios to ensure immediate layout height calculation and avoid async image-load shifts
+    let fileAspectRatio: string | undefined;
+    if (frameId === "macbook-pro-16") fileAspectRatio = "4340/2860";
+    else if (frameId === "macbook-air-15") fileAspectRatio = "3580/2364";
+    else if (frameId === "dell-xps-16") fileAspectRatio = "4210/2456";
+    else if (frameId === "imac-24") fileAspectRatio = "4880/5720";
+    else if (frameId === "pro-display-xdr") fileAspectRatio = "6416/4865";
+    else if (frameId === "ipad-pro-13") fileAspectRatio = "2264/2952";
+
     const renderFrameScreenshot = () => {
       if (!state.present.screenshot?.image) {
         return (
@@ -280,7 +287,10 @@ export default function Page() {
     };
 
     return (
-      <div className="relative w-full h-full flex items-center justify-center">
+      <div
+        className="relative w-full"
+        style={fileAspectRatio ? { aspectRatio: fileAspectRatio } : undefined}
+      >
         {/* Screenshot in transparent window */}
         <div
           className="absolute overflow-hidden bg-black"
@@ -309,9 +319,14 @@ export default function Page() {
     <main className="flex h-svh w-svw flex-col overflow-hidden">
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <SidebarProvider style={{ minHeight: "100%", height: "100%" }} className="overflow-hidden">
-          <Sidebar className="w-72 hidden lg:flex" style={{ "--sidebar-width": "18rem" } as React.CSSProperties}>
-            <SidebarContent className="flex h-full flex-col p-2">
-              <BackgroundAndColorsControls state={state.present} dispatch={dispatch} />
+          <Sidebar className="w-80 border-r border-border/50 hidden lg:flex" style={{ "--sidebar-width": "20rem" } as React.CSSProperties}>
+            <SidebarContent className="flex h-full flex-col p-3 gap-3 overflow-hidden">
+              <ScrollArea className="flex-1 min-h-0 pr-1">
+                <BackgroundAndColorsControls state={state.present} dispatch={dispatch} />
+              </ScrollArea>
+              <div className="shrink-0 pt-2.5 border-t border-border/40">
+                <DeviceControls state={state.present} dispatch={dispatch} />
+              </div>
             </SidebarContent>
           </Sidebar>
 
@@ -762,7 +777,6 @@ export default function Page() {
                     <DeviceControls
                       state={state.present}
                       dispatch={dispatch}
-                      setIsDeviceCatalogOpen={setIsDeviceCatalogOpen}
                     />
                   )}
                   {activeMobileDrawer === "adjust" && (
@@ -824,31 +838,6 @@ export default function Page() {
                     )}
                   </div>
 
-                  {/* Section 2: Frame Style */}
-                  <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30">
-                    <button
-                      type="button"
-                      onClick={() => toggleSection("frame")}
-                      className="flex items-center justify-between w-full p-2.5 text-left font-medium text-xs text-foreground bg-card hover:bg-muted/30 transition-colors cursor-pointer"
-                    >
-                      <span>Device & Bezel Frame</span>
-                      {sectionsExpanded.frame ? (
-                        <IconChevronDown className="size-3.5 text-muted-foreground" />
-                      ) : (
-                        <IconChevronRight className="size-3.5 text-muted-foreground" />
-                      )}
-                    </button>
-
-                    {sectionsExpanded.frame && (
-                      <div className="p-3 border-t border-border/40 bg-card/10">
-                        <DeviceControls
-                          state={state.present}
-                          dispatch={dispatch}
-                          setIsDeviceCatalogOpen={setIsDeviceCatalogOpen}
-                        />
-                      </div>
-                    )}
-                  </div>
 
                   {/* Section 3: Fine Tune Settings */}
                   <div className="border border-border/40 rounded-lg overflow-hidden bg-card/30">
@@ -1065,13 +1054,6 @@ export default function Page() {
         </div>
       )}
 
-      {/* Device Catalog Dialog */}
-      <DeviceCatalog
-        isOpen={isDeviceCatalogOpen}
-        onClose={() => setIsDeviceCatalogOpen(false)}
-        state={state.present}
-        dispatch={dispatch}
-      />
 
       {/* Toast Notifications */}
       <Toaster position="bottom-right" theme="dark" closeButton />

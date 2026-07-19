@@ -85,10 +85,10 @@ export const mockupPresets: MockupPreset[] = [
       ...defaultScreenshotSettings,
       radius: 12,
       padding: 0,
-      rotateX: 45,
+      rotateX: 60,
       rotateY: 0,
       rotateZ: -45,
-      perspective: 1000,
+      perspective: 3000,
       zoom: 0.75,
     },
   },
@@ -101,10 +101,10 @@ export const mockupPresets: MockupPreset[] = [
       ...defaultScreenshotSettings,
       radius: 12,
       padding: 0,
-      rotateX: 45,
+      rotateX: 60,
       rotateY: 0,
       rotateZ: 45,
-      perspective: 1000,
+      perspective: 3000,
       zoom: 0.75,
     },
   },
@@ -268,7 +268,7 @@ export const appleFrames: AppleFrame[] = [
       { name: "Silver", value: "Silver", hex: "#e3e4e5" },
       { name: "Space Black", value: "Space Black", hex: "#1c1d21" },
     ],
-    insets: { top: "4.5%", left: "4.5%", right: "4.5%", bottom: "4.5%", borderRadius: "20px" },
+    insets: { top: "3.4%", left: "4.4%", right: "4.5%", bottom: "3.4%", borderRadius: "12px" },
     assetPattern: "/Exports/iPadOS/iPad Pro/M4 & M5/13/iPad Pro 13 M4 & M5 - Portrait - ${color}.png"
   },
   {
@@ -283,7 +283,7 @@ export const appleFrames: AppleFrame[] = [
       { name: "Space Black", value: "Space Black", hex: "#1c1d21" },
       { name: "Silver", value: "Silver", hex: "#e3e4e5" },
     ],
-    insets: { top: "6.8%", left: "12%", right: "12%", bottom: "12.8%", borderRadius: "10px" },
+    insets: { top: "14.0%", left: "10.2%", right: "10.2%", bottom: "11.6%", borderRadius: "8px 8px 0 0" },
     assetPattern: "/Exports/MacBook/MacBook Pro 16.png"
   },
   {
@@ -297,7 +297,7 @@ export const appleFrames: AppleFrame[] = [
     colors: [
       { name: "Space Gray", value: "Space Gray", hex: "#5d5f62" },
     ],
-    insets: { top: "6.8%", left: "12%", right: "12%", bottom: "12.8%", borderRadius: "10px" },
+    insets: { top: "14.0%", left: "9.8%", right: "9.8%", bottom: "11.4%", borderRadius: "8px 8px 0 0" },
     assetPattern: "/Exports/MacBook/MacBook Air 15.png"
   },
   {
@@ -312,7 +312,7 @@ export const appleFrames: AppleFrame[] = [
       { name: "Graphite", value: "Graphite", hex: "#3a3c3e" },
       { name: "Platinum", value: "Platinum", hex: "#e3e4e5" },
     ],
-    insets: { top: "5.5%", left: "10.5%", right: "10.5%", bottom: "10.8%", borderRadius: "8px" },
+    insets: { top: "8.1%", left: "11%", right: "11%", bottom: "8.3%", borderRadius: "0" },
     assetPattern: "/Exports/Windows Laptop/Dell/2024 XPS 16 Graphite.png"
   },
   {
@@ -332,7 +332,7 @@ export const appleFrames: AppleFrame[] = [
       { name: "Red", value: "Red", hex: "#b84f59" },
       { name: "Yellow", value: "Yellow", hex: "#d4aa55" },
     ],
-    insets: { top: "4.5%", left: "4.5%", right: "4.5%", bottom: "22.5%", borderRadius: "8px" },
+    insets: { top: "28.0%", left: "4.1%", right: "4.1%", bottom: "28.0%", borderRadius: "0" },
     assetPattern: "/Exports/Mac Desktop/iMac 24/iMac 24 - ${color}.png"
   },
   {
@@ -346,7 +346,7 @@ export const appleFrames: AppleFrame[] = [
     colors: [
       { name: "Silver", value: "Silver", hex: "#e3e4e5" },
     ],
-    insets: { top: "4.8%", left: "4.8%", right: "4.8%", bottom: "24.5%", borderRadius: "10px" },
+    insets: { top: "4.1%", left: "3.1%", right: "3.1%", bottom: "26.4%", borderRadius: "0" },
     assetPattern: "/Exports/Mac Desktop/Pro Display XDR/Pro Display XDR.png"
   },
 ];
@@ -401,14 +401,14 @@ export const sliderSettings: {
   { label: "X", key: "x", min: -300, max: 300, step: 1, unit: "px" },
   { label: "Y", key: "y", min: -200, max: 200, step: 1, unit: "px" },
   { label: "Zoom", key: "zoom", min: 0.5, max: 1.6, step: 0.01, unit: "x" },
-  { label: "Rotate X", key: "rotateX", min: -45, max: 45, step: 1, unit: "deg" },
-  { label: "Rotate Y", key: "rotateY", min: -45, max: 45, step: 1, unit: "deg" },
-  { label: "Rotate Z", key: "rotateZ", min: -45, max: 45, step: 1, unit: "deg" },
+  { label: "Rotate X", key: "rotateX", min: -80, max: 80, step: 1, unit: "deg" },
+  { label: "Rotate Y", key: "rotateY", min: -80, max: 80, step: 1, unit: "deg" },
+  { label: "Rotate Z", key: "rotateZ", min: -180, max: 180, step: 1, unit: "deg" },
   {
     label: "Perspective",
     key: "perspective",
     min: 300,
-    max: 2000,
+    max: 5000,
     step: 10,
     unit: "px",
   },

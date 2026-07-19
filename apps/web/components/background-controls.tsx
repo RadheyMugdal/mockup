@@ -227,7 +227,7 @@ export function BackgroundAndColorsControls({
       </TabsList>
       <div className="min-h-0 flex-1 pt-2 flex flex-col">
         <TabsContent value="background" className="h-full flex flex-col min-h-0 flex-1">
-          <ScrollArea className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 space-y-4">
             {categories.map((category) => {
               const Icon = category.icon;
               const categoryBackgrounds = backgrounds.filter(
@@ -325,7 +325,7 @@ export function BackgroundAndColorsControls({
                 </div>
               );
             })}
-          </ScrollArea>
+          </div>
         </TabsContent>
 
         <TabsContent value="colors" className="h-full flex flex-col min-h-0 flex-1">
@@ -356,9 +356,9 @@ export function BackgroundAndColorsControls({
               })}
             </div>
 
-            <ScrollArea className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0 space-y-4 pr-1">
               {colorSubTab === "presets" && (
-                <div className="space-y-6 pr-2">
+                <div className="space-y-6 px-0.5">
                   {/* Solids Section */}
                   <div>
                     <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
@@ -481,7 +481,7 @@ export function BackgroundAndColorsControls({
               )}
 
               {colorSubTab === "custom" && (
-                <div className="space-y-4 pr-2">
+                <div className="space-y-4 px-0.5">
                   {/* Preview box */}
                   <div>
                     <Label className="text-xs text-muted-foreground mb-1.5 block">Gradient Preview</Label>
@@ -743,7 +743,7 @@ export function BackgroundAndColorsControls({
               )}
 
               {colorSubTab === "saved" && (
-                <div className="space-y-4 pr-2">
+                <div className="space-y-4 px-0.5">
                   {savedPresets.length === 0 ? (
                     <div className="text-center py-10 px-4 border border-dashed rounded-lg bg-card/40">
                       <IconPalette className="size-8 text-muted-foreground/60 mx-auto mb-2" />
@@ -808,7 +808,7 @@ export function BackgroundAndColorsControls({
                   )}
                 </div>
               )}
-            </ScrollArea>
+            </div>
           </div>
         </TabsContent>
       </div>
