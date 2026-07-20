@@ -24,7 +24,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/component
 import { Sidebar, SidebarContent, SidebarProvider } from "@workspace/ui/components/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "@workspace/ui/components/drawer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 
 // Split Imports
 import { appleFrames, initialState } from "@/lib/constants";
@@ -39,6 +38,8 @@ import { LayoutControls } from "@/components/layout-controls";
 import { DeviceControls } from "@/components/device-controls";
 import { FineTuneControls } from "@/components/fine-tune-controls";
 import { ExportActionsControls } from "@/components/export-actions";
+import { SvgDeviceFrame } from "@/components/svg-device-frame";
+
 
 
 export default function Page() {
@@ -248,26 +249,186 @@ export default function Page() {
     const frame = appleFrames.find((f) => f.id === frameId);
     if (!frame) return null;
 
-    const imageUrl = frame.assetPattern.replace("${color}", color);
-    const insets = frame.insets;
+    return (
+      <SvgDeviceFrame
+        frame={frame}
+        color={color}
+        screenshotImage={state.present.screenshot?.image}
+        onUploadScreenshot={handleScreenshotUpload}
+      />
+    );
+  };
 
-    // Explicit image file aspect ratios to ensure immediate layout height calculation and avoid async image-load shifts
-    let fileAspectRatio: string | undefined;
-    if (frameId === "macbook-pro-16") fileAspectRatio = "4340/2860";
-    else if (frameId === "macbook-air-15") fileAspectRatio = "3580/2364";
-    else if (frameId === "dell-xps-16") fileAspectRatio = "4210/2456";
-    else if (frameId === "imac-24") fileAspectRatio = "4880/5720";
-    else if (frameId === "pro-display-xdr") fileAspectRatio = "6416/4865";
-    else if (frameId === "ipad-pro-13") fileAspectRatio = "2264/2952";
+  const renderMockupCard = () => {
 
-    const renderFrameScreenshot = () => {
-      if (!state.present.screenshot?.image) {
-        return (
-          <label className="flex w-full h-full cursor-pointer flex-col items-center justify-center gap-2 bg-zinc-900/90 hover:bg-zinc-850 transition-colors select-none p-4">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary/10 shrink-0">
-              <IconUpload className="size-4 text-primary" />
+    if (state.present.frameStyle === "custom-device" && state.present.selectedFrame) {
+      const frame = appleFrames.find((f) => f.id === state.present.selectedFrame?.id);
+      const category = frame?.category ?? "phone";
+      return (
+        <div
+          className={cn(
+            "mockup-card transition-all duration-300 relative flex flex-col items-center justify-center",
+            category === "laptop" || category === "desktop"
+              ? canvasRatio === "16-9"
+                ? "w-[80%] max-w-4xl"
+                : canvasRatio === "4-3"
+                  ? "w-[82%] max-w-3xl"
+                  : canvasRatio === "1-1"
+                    ? "w-[85%] max-w-2xl"
+                    : "w-[90%] max-w-md"
+              : category === "tablet"
+                ? canvasRatio === "16-9"
+                  ? "w-[40%] max-w-[380px]"
+                  : canvasRatio === "4-3"
+                    ? "w-[48%] max-w-[420px]"
+                    : canvasRatio === "1-1"
+                      ? "w-[58%] max-w-[460px]"
+                      : "w-[75%] max-w-[360px]"
+                : canvasRatio === "16-9"
+                  ? "w-[24%] max-w-[220px]"
+                  : canvasRatio === "4-3"
+                    ? "w-[30%] max-w-[240px]"
+                    : canvasRatio === "1-1"
+                      ? "w-[48%] max-w-[260px]"
+                      : "w-[75%] max-w-[280px]"
+          )}
+          style={{
+            transform: `
+              translate(${screenshotX}px, ${screenshotY}px)
+              rotateX(${screenshotRotateX}deg)
+              rotateY(${screenshotRotateY}deg)
+              rotateZ(${screenshotRotateZ}deg)
+              scale(${screenshotZoom})
+            `,
+            backfaceVisibility: "hidden",
+            transformStyle: "preserve-3d",
+            willChange: "transform",
+            outline: "1px solid transparent",
+          }}
+        >
+          {renderCustomAppleFrame(state.present.selectedFrame.id, state.present.selectedFrame.color)}
+        </div>
+      );
+    }
+
+    if (state.present.deviceType === "mobile") {
+      return (
+        <div
+          className={cn(
+            "mockup-card transition-all duration-300 relative shadow-2xl flex flex-col items-center justify-center",
+            canvasRatio === "16-9" && "w-[24%] max-w-[220px]",
+            canvasRatio === "4-3" && "w-[30%] max-w-[240px]",
+            canvasRatio === "1-1" && "w-[48%] max-w-[260px]",
+            canvasRatio === "9-16" && "w-[75%] max-w-[280px]"
+          )}
+          style={{
+            transform: `
+              translate(${screenshotX}px, ${screenshotY}px)
+              rotateX(${screenshotRotateX}deg)
+              rotateY(${screenshotRotateY}deg)
+              rotateZ(${screenshotRotateZ}deg)
+              scale(${screenshotZoom})
+            `,
+            backfaceVisibility: "hidden",
+            transformStyle: "preserve-3d",
+            willChange: "transform",
+            outline: "1px solid transparent",
+          }}
+        >
+          <div
+            className={cn(
+              "w-full rounded-[38px] p-[6px] transition-all duration-300 shadow-2xl relative",
+              state.present.frameStyle === "phone-light"
+                ? "bg-zinc-200 shadow-zinc-400/20"
+                : state.present.frameStyle === "phone-dark"
+                  ? "bg-zinc-800 shadow-black/40"
+                  : "bg-transparent p-0"
+            )}
+          >
+            <div
+              className={cn(
+                "w-full rounded-[32px] overflow-hidden aspect-[9/19.5] relative bg-black",
+                state.present.frameStyle === "none" && "rounded-xl"
+              )}
+              style={state.present.frameStyle === "none" ? { borderRadius: `${screenshotRadius}px` } : {}}
+            >
+              {(state.present.frameStyle === "phone-light" || state.present.frameStyle === "phone-dark") && (
+                <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-14 h-3.5 rounded-full bg-black z-20 flex items-center justify-center">
+                  <span className="size-1 rounded-full bg-[#111] absolute right-2.5 opacity-60 ring-1 ring-blue-900/30" />
+                </div>
+              )}
+
+              {(state.present.frameStyle === "phone-light" || state.present.frameStyle === "phone-dark") && (
+                <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full bg-white/30 z-20" />
+              )}
+
+              {!state.present.screenshot?.image ? (
+                <label className="flex aspect-[9/19.5] w-full cursor-pointer flex-col items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 transition-colors">
+                  <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
+                    <IconUpload className="size-5 text-primary" />
+                  </div>
+                  <p className="text-[9px] font-medium text-zinc-400">Upload screenshot</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleScreenshotUpload}
+                  />
+                </label>
+              ) : (
+                <img
+                  src={state.present.screenshot.image}
+                  className="aspect-[9/19.5] w-full object-cover"
+                  alt="Mobile Screenshot"
+                />
+              )}
             </div>
-            <p className="text-[9px] font-medium text-zinc-400 text-center">Upload mockup image</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={cn(
+          "mockup-card overflow-hidden drop-shadow-[0_40px_60px_rgba(0,0,0,.35)] flex flex-col bg-background",
+          canvasRatio === "16-9" && "w-[85%] max-w-4xl",
+          canvasRatio === "4-3" && "w-[88%] max-w-3xl",
+          canvasRatio === "1-1" && "w-[90%] max-w-2xl",
+          canvasRatio === "9-16" && "w-[94%] max-w-md"
+        )}
+        style={{
+          borderRadius: `${screenshotRadius}px`,
+          padding: `${screenshotPadding}px`,
+          transform: `
+            translate(${screenshotX}px, ${screenshotY}px)
+            rotateX(${screenshotRotateX}deg)
+            rotateY(${screenshotRotateY}deg)
+            rotateZ(${screenshotRotateZ}deg)
+            scale(${screenshotZoom})
+          `,
+          backfaceVisibility: "hidden",
+          transformStyle: "preserve-3d",
+          willChange: "transform",
+          outline: "1px solid transparent",
+        }}
+      >
+        {state.present.frameStyle &&
+          state.present.frameStyle !== "none" &&
+          state.present.frameStyle !== "phone-light" &&
+          state.present.frameStyle !== "phone-dark" && (
+            <BrowserHeader theme={state.present.frameStyle === "browser-light" ? "light" : "dark"} />
+          )}
+        {!state.present.screenshot?.image ? (
+          <label className="flex aspect-video w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-md border border-dashed border-border/60 bg-background/50 transition-all hover:border-primary hover:bg-background backdrop-blur-sm p-4 overflow-hidden">
+            <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 shrink-0">
+              <IconUpload className="size-5 text-primary" />
+            </div>
+            <div className="text-center px-2">
+              <p className="font-medium text-xs sm:text-sm">Upload screenshot</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Drag & drop or click to browse</p>
+              <p className="text-[9px] text-muted-foreground/60 mt-1">PNG, JPG, WEBP</p>
+            </div>
             <input
               type="file"
               accept="image/*"
@@ -275,45 +436,19 @@ export default function Page() {
               onChange={handleScreenshotUpload}
             />
           </label>
-        );
-      }
-      return (
-        <img
-          src={state.present.screenshot.image}
-          className="w-full h-full object-cover shrink-0 select-none"
-          alt="Mockup Screenshot"
-        />
-      );
-    };
-
-    return (
-      <div
-        className="relative w-full"
-        style={fileAspectRatio ? { aspectRatio: fileAspectRatio } : undefined}
-      >
-        {/* Screenshot in transparent window */}
-        <div
-          className="absolute overflow-hidden bg-black"
-          style={{
-            top: insets.top,
-            left: insets.left,
-            right: insets.right,
-            bottom: insets.bottom,
-            borderRadius: insets.borderRadius,
-          }}
-        >
-          {renderFrameScreenshot()}
-        </div>
-
-        {/* Bezel Overlay */}
-        <img
-          src={imageUrl}
-          className="relative w-full h-auto pointer-events-none select-none z-10 block"
-          alt={frame.name}
-        />
+        ) : (
+          <img
+            src={state.present.screenshot.image}
+            className="aspect-video w-full object-cover"
+            alt="Screenshot"
+          />
+        )}
       </div>
     );
   };
+
+
+
 
   return (
     <main className="flex h-svh w-svw flex-col overflow-hidden">
@@ -473,192 +608,7 @@ export default function Page() {
               >
                 {renderBackground()}
                 <div className="absolute inset-0 flex items-center justify-center [backface-visibility:hidden] [transform-style:preserve-3d]" style={{ perspective: `${screenshotPerspective}px` }}>
-                  {state.present.frameStyle === "custom-device" && state.present.selectedFrame ? (
-                    (() => {
-                      const frame = appleFrames.find((f) => f.id === state.present.selectedFrame?.id);
-                      const category = frame?.category ?? "phone";
-                      return (
-                        <div
-                          className={cn(
-                            "mockup-card transition-all duration-300 relative flex flex-col items-center justify-center",
-                            category === "laptop" || category === "desktop"
-                              ? canvasRatio === "16-9"
-                                ? "w-[80%] max-w-4xl"
-                                : canvasRatio === "4-3"
-                                  ? "w-[82%] max-w-3xl"
-                                  : canvasRatio === "1-1"
-                                    ? "w-[85%] max-w-2xl"
-                                    : "w-[90%] max-w-md"
-                              : category === "tablet"
-                                ? canvasRatio === "16-9"
-                                  ? "w-[40%] max-w-[380px]"
-                                  : canvasRatio === "4-3"
-                                    ? "w-[48%] max-w-[420px]"
-                                    : canvasRatio === "1-1"
-                                      ? "w-[58%] max-w-[460px]"
-                                      : "w-[75%] max-w-[360px]"
-                                : canvasRatio === "16-9"
-                                  ? "w-[24%] max-w-[220px]"
-                                  : canvasRatio === "4-3"
-                                    ? "w-[30%] max-w-[240px]"
-                                    : canvasRatio === "1-1"
-                                      ? "w-[48%] max-w-[260px]"
-                                      : "w-[75%] max-w-[280px]"
-                          )}
-                          style={{
-                            transform: `
-                              translate(${screenshotX}px, ${screenshotY}px)
-                              rotateX(${screenshotRotateX}deg)
-                              rotateY(${screenshotRotateY}deg)
-                              rotateZ(${screenshotRotateZ}deg)
-                              scale(${screenshotZoom})
-                            `,
-                            backfaceVisibility: "hidden",
-                            transformStyle: "preserve-3d",
-                            willChange: "transform",
-                            outline: "1px solid transparent",
-                          }}
-                        >
-                          {renderCustomAppleFrame(state.present.selectedFrame.id, state.present.selectedFrame.color)}
-                        </div>
-                      );
-                    })()
-                  ) : state.present.deviceType === "mobile" ? (
-                    /* Mobile Mockup Card */
-                    <div
-                      className={cn(
-                        "mockup-card transition-all duration-300 relative shadow-2xl flex flex-col items-center justify-center",
-                        canvasRatio === "16-9" && "w-[24%] max-w-[220px]",
-                        canvasRatio === "4-3" && "w-[30%] max-w-[240px]",
-                        canvasRatio === "1-1" && "w-[48%] max-w-[260px]",
-                        canvasRatio === "9-16" && "w-[75%] max-w-[280px]"
-                      )}
-                      style={{
-                        transform: `
-                          translate(${screenshotX}px, ${screenshotY}px)
-                          rotateX(${screenshotRotateX}deg)
-                          rotateY(${screenshotRotateY}deg)
-                          rotateZ(${screenshotRotateZ}deg)
-                          scale(${screenshotZoom})
-                        `,
-                        backfaceVisibility: "hidden",
-                        transformStyle: "preserve-3d",
-                        willChange: "transform",
-                        outline: "1px solid transparent",
-                      }}
-                    >
-                      {/* Phone Frame Wrapper */}
-                      <div
-                        className={cn(
-                          "w-full rounded-[38px] p-[6px] transition-all duration-300 shadow-2xl relative",
-                          state.present.frameStyle === "phone-light"
-                            ? "bg-zinc-200 shadow-zinc-400/20"
-                            : state.present.frameStyle === "phone-dark"
-                              ? "bg-zinc-800 shadow-black/40"
-                              : "bg-transparent p-0"
-                        )}
-                      >
-                        {/* Inner Bezel */}
-                        <div
-                          className={cn(
-                            "w-full rounded-[32px] overflow-hidden aspect-[9/19.5] relative bg-black",
-                            state.present.frameStyle === "none" && "rounded-xl"
-                          )}
-                          style={state.present.frameStyle === "none" ? { borderRadius: `${screenshotRadius}px` } : {}}
-                        >
-                          {/* Dynamic Island */}
-                          {(state.present.frameStyle === "phone-light" || state.present.frameStyle === "phone-dark") && (
-                            <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-14 h-3.5 rounded-full bg-black z-20 flex items-center justify-center">
-                              <span className="size-1 rounded-full bg-[#111] absolute right-2.5 opacity-60 ring-1 ring-blue-900/30" />
-                            </div>
-                          )}
-
-                          {/* Home Indicator */}
-                          {(state.present.frameStyle === "phone-light" || state.present.frameStyle === "phone-dark") && (
-                            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-16 h-1 rounded-full bg-white/30 z-20" />
-                          )}
-
-                          {!state.present.screenshot?.image ? (
-                            <label className="flex aspect-[9/19.5] w-full cursor-pointer flex-col items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 transition-colors">
-                              <div className="flex size-10 items-center justify-center rounded-full bg-primary/10">
-                                <IconUpload className="size-5 text-primary" />
-                              </div>
-                              <p className="text-[9px] font-medium text-zinc-400">Upload screenshot</p>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                onChange={handleScreenshotUpload}
-                              />
-                            </label>
-                          ) : (
-                            <img
-                              src={state.present.screenshot.image}
-                              className="aspect-[9/19.5] w-full object-cover"
-                              alt="Mobile Screenshot"
-                            />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Desktop Mockup Card */
-                    <div
-                      className={cn(
-                        "mockup-card overflow-hidden drop-shadow-[0_40px_60px_rgba(0,0,0,.35)] flex flex-col bg-background",
-                        canvasRatio === "16-9" && "w-[85%] max-w-4xl",
-                        canvasRatio === "4-3" && "w-[88%] max-w-3xl",
-                        canvasRatio === "1-1" && "w-[90%] max-w-2xl",
-                        canvasRatio === "9-16" && "w-[94%] max-w-md"
-                      )}
-                      style={{
-                        borderRadius: `${screenshotRadius}px`,
-                        padding: `${screenshotPadding}px`,
-                        transform: `
-                          translate(${screenshotX}px, ${screenshotY}px)
-                          rotateX(${screenshotRotateX}deg)
-                          rotateY(${screenshotRotateY}deg)
-                          rotateZ(${screenshotRotateZ}deg)
-                          scale(${screenshotZoom})
-                        `,
-                        backfaceVisibility: "hidden",
-                        transformStyle: "preserve-3d",
-                        willChange: "transform",
-                        outline: "1px solid transparent",
-                      }}
-                    >
-                      {state.present.frameStyle &&
-                        state.present.frameStyle !== "none" &&
-                        state.present.frameStyle !== "phone-light" &&
-                        state.present.frameStyle !== "phone-dark" && (
-                          <BrowserHeader theme={state.present.frameStyle === "browser-light" ? "light" : "dark"} />
-                        )}
-                      {!state.present.screenshot?.image ? (
-                        <label className="flex aspect-video w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-md border border-dashed border-border/60 bg-background/50 transition-all hover:border-primary hover:bg-background backdrop-blur-sm p-4 overflow-hidden">
-                          <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 shrink-0">
-                            <IconUpload className="size-5 text-primary" />
-                          </div>
-                          <div className="text-center px-2">
-                            <p className="font-medium text-xs sm:text-sm">Upload screenshot</p>
-                            <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Drag & drop or click to browse</p>
-                            <p className="text-[9px] text-muted-foreground/60 mt-1">PNG, JPG, WEBP</p>
-                          </div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleScreenshotUpload}
-                          />
-                        </label>
-                      ) : (
-                        <img
-                          src={state.present.screenshot.image}
-                          className="aspect-video w-full object-cover"
-                          alt="Screenshot"
-                        />
-                      )}
-                    </div>
-                  )}
+                  {renderMockupCard()}
                 </div>
               </div>
             </div>
@@ -820,26 +770,28 @@ export default function Page() {
                 />
               </div>
 
-              {/* Tabs for Layouts presets and Adjust controls */}
-              <Tabs defaultValue="layouts" className="flex-1 flex flex-col min-h-0">
-                <TabsList className="grid w-full grid-cols-2 shrink-0">
-                  <TabsTrigger value="layouts">
-                    Layouts
-                  </TabsTrigger>
-                  <TabsTrigger value="adjust">
-                    Adjust
-                  </TabsTrigger>
-                </TabsList>
-
-                <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar pt-2">
-                  <TabsContent value="layouts" className="m-0 outline-none">
-                    <LayoutControls state={state.present} dispatch={dispatch} />
-                  </TabsContent>
-                  <TabsContent value="adjust" className="m-0 outline-none">
-                    <FineTuneControls state={state.present} updateScreenshot={updateScreenshot} />
-                  </TabsContent>
+              {/* Adjust and Layout Controls stacked vertically */}
+              <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar flex flex-col gap-6 pt-1">
+                {/* Adjust (Zoom / Tilt) Controls */}
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-border/10 pb-1.5">
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      Adjust
+                    </span>
+                  </div>
+                  <FineTuneControls state={state.present} updateScreenshot={updateScreenshot} />
                 </div>
-              </Tabs>
+
+                {/* Layouts Presets */}
+                <div className="flex flex-col gap-3 border-t border-border/40 pt-5">
+                  <div className="flex items-center justify-between border-b border-border/10 pb-1.5">
+                    <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      Layouts
+                    </span>
+                  </div>
+                  <LayoutControls state={state.present} dispatch={dispatch} />
+                </div>
+              </div>
             </SidebarContent>
           </Sidebar>
         </SidebarProvider>
@@ -905,137 +857,7 @@ export default function Page() {
           >
             {renderBackground()}
             <div className="absolute inset-0 flex items-center justify-center" style={{ perspective: `${screenshotPerspective}px` }}>
-              {state.present.frameStyle === "custom-device" && state.present.selectedFrame ? (
-                (() => {
-                  const frame = appleFrames.find((f) => f.id === state.present.selectedFrame?.id);
-                  const category = frame?.category ?? "phone";
-                  return (
-                    <div
-                      className={cn(
-                        "mockup-card transition-all duration-300 relative flex flex-col items-center justify-center",
-                        category === "laptop" || category === "desktop"
-                          ? canvasRatio === "16-9"
-                            ? "w-[80%] max-w-4xl"
-                            : canvasRatio === "4-3"
-                              ? "w-[82%] max-w-3xl"
-                              : canvasRatio === "1-1"
-                                ? "w-[85%] max-w-2xl"
-                                : "w-[90%] max-w-md"
-                          : category === "tablet"
-                            ? canvasRatio === "16-9"
-                              ? "w-[40%] max-w-[380px]"
-                              : canvasRatio === "4-3"
-                                ? "w-[48%] max-w-[420px]"
-                                : canvasRatio === "1-1"
-                                  ? "w-[58%] max-w-[460px]"
-                                  : "w-[75%] max-w-[360px]"
-                            : canvasRatio === "16-9"
-                              ? "w-[24%] max-w-[220px]"
-                              : canvasRatio === "4-3"
-                                ? "w-[30%] max-w-[240px]"
-                                : canvasRatio === "1-1"
-                                  ? "w-[48%] max-w-[260px]"
-                                  : "w-[75%] max-w-[280px]"
-                      )}
-                      style={{
-                        transform: `
-                          translate(${screenshotX}px, ${screenshotY}px)
-                          rotateX(${screenshotRotateX}deg)
-                          rotateY(${screenshotRotateY}deg)
-                          rotateZ(${screenshotRotateZ}deg)
-                          scale(${screenshotZoom})
-                        `,
-                        backfaceVisibility: "hidden",
-                        transformStyle: "preserve-3d",
-                        willChange: "transform",
-                        outline: "1px solid transparent",
-                      }}
-                    >
-                      {renderCustomAppleFrame(state.present.selectedFrame.id, state.present.selectedFrame.color)}
-                    </div>
-                  );
-                })()
-              ) : state.present.deviceType === "mobile" ? (
-                /* Mobile Mockup Card */
-                <div
-                  className="mockup-card w-[42%] max-w-[260px] overflow-hidden drop-shadow-[0_30px_50px_rgba(0,0,0,.45)] flex flex-col transition-all duration-300 relative border-black"
-                  style={{
-                    borderRadius: `32px`,
-                    padding: `${screenshotPadding / 6 + 6}px`,
-                    borderWidth: `9px`,
-                    borderColor: state.present.frameStyle === "phone-light" ? "#f4f4f5" : "#18181b",
-                    backgroundColor: state.present.frameStyle === "phone-light" ? "#f4f4f5" : "#18181b",
-                    transform: `
-                      translate(${screenshotX}px, ${screenshotY}px)
-                      rotateX(${screenshotRotateX}deg)
-                      rotateY(${screenshotRotateY}deg)
-                      rotateZ(${screenshotRotateZ}deg)
-                      scale(${screenshotZoom})
-                    `,
-                    backfaceVisibility: "hidden",
-                    transformStyle: "preserve-3d",
-                    willChange: "transform",
-                    outline: "1px solid transparent",
-                  }}
-                >
-                  {/* Dynamic Island */}
-                  <div className="absolute top-2 left-1/2 -translate-x-1/2 w-14 h-3.5 rounded-full bg-black z-20 flex items-center justify-center">
-                    <span className="size-1 rounded-full bg-[#1c1c1e] absolute right-2.5 opacity-60" />
-                  </div>
-                  {/* Home Indicator */}
-                  <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-16 h-0.75 rounded-full bg-white/40 z-20" />
-
-                  {!state.present.screenshot?.image ? (
-                    <div className="flex aspect-[9/19.5] w-full items-center justify-center rounded-[24px] bg-background/50">
-                      <p className="text-[10px] text-muted-foreground">No mobile image</p>
-                    </div>
-                  ) : (
-                    <img
-                      src={state.present.screenshot.image}
-                      className="aspect-[9/19.5] w-full object-cover rounded-[24px] shadow-inner"
-                      alt="Mobile Screenshot"
-                    />
-                  )}
-                </div>
-              ) : (
-                /* Desktop Mockup Card */
-                <div
-                  className="mockup-card w-[85%] max-w-4xl overflow-hidden drop-shadow-[0_40px_60px_rgba(0,0,0,.35)] flex flex-col bg-background"
-                  style={{
-                    borderRadius: `${screenshotRadius}px`,
-                    padding: `${screenshotPadding}px`,
-                    transform: `
-                      translate(${screenshotX}px, ${screenshotY}px)
-                      rotateX(${screenshotRotateX}deg)
-                      rotateY(${screenshotRotateY}deg)
-                      rotateZ(${screenshotRotateZ}deg)
-                      scale(${screenshotZoom})
-                    `,
-                    backfaceVisibility: "hidden",
-                    transformStyle: "preserve-3d",
-                    willChange: "transform",
-                    outline: "1px solid transparent",
-                  }}
-                >
-                  {state.present.frameStyle &&
-                    state.present.frameStyle !== "none" &&
-                    state.present.frameStyle !== "phone-light" &&
-                    state.present.frameStyle !== "phone-dark" && (
-                      <BrowserHeader theme={state.present.frameStyle === "browser-light" ? "light" : "dark"} />
-                    )}
-                  {!state.present.screenshot?.image ? (
-                    <div className="flex aspect-video w-full flex-col items-center justify-center gap-4 rounded-md border border-dashed border-border/60 bg-background/50 backdrop-blur-sm">
-                      <p className="font-medium text-muted-foreground text-sm">No screenshot uploaded</p>
-                    </div>
-                  ) : (
-                    <img
-                      src={state.present.screenshot.image}
-                      className="aspect-video w-full object-cover"
-                      alt="Screenshot"
-                    />
-                  )}
-                </div>
-              )}
+              {renderMockupCard()}
             </div>
           </div>
         </div>
